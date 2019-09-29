@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * @Date : 2019/9/19
- * @Author : jingl.wang [jingl.wang123@gmai.com]
+ * @Author : jingl.wang [jingl.wang123@gmail.com]
  * @Desc :
  */
 public class AviatorTest {
@@ -42,6 +42,7 @@ public class AviatorTest {
             env.put("d", null);
             Boolean result = (Boolean) compiledExp.execute(env);
             costTimes.add(System.currentTimeMillis() - startTime);
+
         }
 
         System.out.println(costTimes.stream().mapToLong(x -> x).average());

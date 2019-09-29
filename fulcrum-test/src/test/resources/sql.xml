@@ -1,0 +1,27 @@
+<Sql>
+    select *
+    from
+    table
+    where
+    1=1
+    <if>
+        <case cond="a=1">
+            and a = {$a}
+        </case>
+        <else>
+            and a = 1
+        </else>
+    </if>
+    and ( 1!=1
+        <for list = 'list' item = 'item'>
+            <if>
+                <case cond="item!=null">
+                    or a = {item.a}
+                </case>
+                <else>
+                    or a = ''
+                </else>
+            </if>
+        </for>
+    )
+</Sql>

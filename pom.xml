@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>fulcrum-test</module>
+        <module>fulcrum-dynamicsql</module>
     </modules>
 
     <properties>
