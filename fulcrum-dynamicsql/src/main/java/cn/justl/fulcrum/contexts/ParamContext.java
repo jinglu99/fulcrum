@@ -87,7 +87,7 @@ public class ParamContext {
         }
 
         public Context(Map<String, Object> params) {
-
+            this.params = Optional.ofNullable(params).orElse(new HashMap<>());
         }
 
         public Context reset(Map<String, Object> params) {

@@ -12,7 +12,7 @@ public final class TextScriptHandler extends AbstractScriptHandler {
     private final String text;
 
     public TextScriptHandler(String text) {
-        this.text = text;
+        this.text = text.trim();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cn.justl.fulcrum.parsers.xml;
 
 import cn.justl.fulcrum.parsers.exceptions.XmlParseException;
+import cn.justl.fulcrum.parsers.handlers.*;
 import cn.justl.fulcrum.parsers.objs.enums.XmlElements;
 import cn.justl.fulcrum.parsers.utils.JavaCodeUtils;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
@@ -35,10 +36,9 @@ public class XMLSqlParser {
     private XPath xPath = null;
 
     private StringBuilder codeBuilder = JavaCodeUtils.start();
-    private List<Object> paramList = new ArrayList<>();
 
-    private int foreachListCn = 0;
 
+    private ScriptHandler scriptHandler;
 
     public XMLSqlParser(InputStream inputStream) throws XmlParseException {
         try {
@@ -60,89 +60,79 @@ public class XMLSqlParser {
         }
     }
 
-    public StringBuilder parse() throws XmlParseException {
+    public ScriptHandler parse() throws XmlParseException {
         try {
             Node sqlNode = (Node) xPath.evaluate("//Sql", doc, XPathConstants.NODE);
-            parse(sqlNode);
-            return null;
+            scriptHandler = parse(sqlNode);
+            return scriptHandler;
         } catch (XPathExpressionException e) {
             throw new XmlParseException("Element <Sql> not found", e);
         }
     }
 
-    private void parse(Node node) {
+    private ScriptHandler parse(Node node) throws XmlParseException {
         NodeList nodeList = node.getChildNodes();
+        ListableScriptHandler scriptHandler = new ListableScriptHandler();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node child = nodeList.item(i);
             if (child.getNodeType() == Node.TEXT_NODE) {
-                JavaCodeUtils.append(codeBuilder, resolveText(child.getTextContent()));
+                scriptHandler.addNext(new TextScriptHandler(child.getTextContent()));
             } else if (child.getNodeType() == Node.ELEMENT_NODE) {
-                parse(child);
+                scriptHandler.addNext(parseElement(child));
             }
         }
+        return scriptHandler;
     }
 
-    private void parseElement(Node node) throws XmlParseException {
+    private ScriptHandler parseElement(Node node) throws XmlParseException {
         if (XmlElements.isDefaultElement(node)) {
-            parseDefaultElement(node);
+            return parseDefaultElement(node);
         } else {
             throw new XmlParseException("Element: <" + node.getNodeName() + "> can not be parsed");
         }
     }
 
-    private void parseDefaultElement(Node node) {
+    private ScriptHandler parseDefaultElement(Node node) throws XmlParseException {
 
+        ScriptHandler handler = null;
+        if ((handler = parseIfElementIfMatched(node)) != null) return handler;
+
+        if ((handler = parseForeachElementIfMatched(node)) != null) return handler;
+
+        throw new XmlParseException("Element: <" + node.getNodeName() + "> can not be parsed");
     }
 
-    private void parseIfElementIfMatched(Node node) {
-        if (!XmlElements.IF.isMatch(node)) return;
+    private ScriptHandler parseIfElementIfMatched(Node node) throws XmlParseException {
+        if (!XmlElements.IF.isMatch(node)) return null;
 
-        boolean needElse = false;
+        IfScriptHandler ifScriptHandler = new IfScriptHandler();
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node item = nodeList.item(i);
             if (item.getNodeName().toLowerCase().equals("case")) {
-                String cond = item.getAttributes().getNamedItem("cond").getTextContent();
-                JavaCodeUtils.If(codeBuilder, resolveCondExp(cond), needElse);
-                parse(item);
-                JavaCodeUtils.EndIf(codeBuilder);
-                needElse = true;
+                ifScriptHandler.addCase(item.getAttributes().getNamedItem("cond").getTextContent(), parse(item));
             } else if (item.getNodeName().toLowerCase().equals("else")) {
-                JavaCodeUtils.Else(codeBuilder);
-                parse(item);
-                JavaCodeUtils.EndElse(codeBuilder);
+                ifScriptHandler.addElse(parse(item));
             }
         }
+        return ifScriptHandler;
     }
 
-    private void parseForeachElementIfMatched(Node node) {
-        if (!XmlElements.FOREACH.isMatch(node)) return;
+    private ScriptHandler parseForeachElementIfMatched(Node node) throws XmlParseException {
+        if (!XmlElements.FOR.isMatch(node)) return null;
 
-//        String list = node.getAttributes().getNamedItem("list").getTextContent();
-//        String map = node.getAttributes().getNamedItem("map").getTextContent();
-//        String item = node.getAttributes().getNamedItem("item").getTextContent();
-//        String separator = node.getAttributes().getNamedItem("separator").getTextContent();
-//
-////        codeBuilder.append("for(int index = 0; index < collection.size(); i++")
-//        Object col = null;
-//        List<StringBuilder>
-//        for (Object i : ((Map)col).entrySet()) {
-//            codeBuilder.append("")
-//        }
+        Node collection = node.getAttributes().getNamedItem("collection");
+        Node item = node.getAttributes().getNamedItem("item");
+        Node index = node.getAttributes().getNamedItem("index");
+        Node separator = node.getAttributes().getNamedItem("separator");
 
+        String collectionName = collection.getTextContent();
+        String itemName = item.getTextContent();
+        String indexName = index == null ? "##_INDEX" : index.getTextContent();
+        String separator1 = separator == null ? "" : separator.getTextContent();
+
+        ForeachScriptHandler scriptHandler = new ForeachScriptHandler(collectionName, itemName, indexName, separator1);
+        scriptHandler.setChild(parse(node));
+        return scriptHandler;
     }
-
-    public StringBuilder resolveParam(String param) {
-        return new StringBuilder(param);
-    }
-
-    public StringBuilder resolveText(String text) {
-        return new StringBuilder(text);
-    }
-
-    public StringBuilder resolveCondExp(String cond) {
-        return new StringBuilder(cond);
-    }
-
-
 }

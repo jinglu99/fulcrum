@@ -13,7 +13,7 @@ public enum XmlElements {
 
     SQL("sql"),
     IF("if"),
-    FOREACH("foreach");
+    FOR("for");
     private String name;
 
     XmlElements(String name) {

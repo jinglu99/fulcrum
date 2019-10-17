@@ -16,6 +16,13 @@
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

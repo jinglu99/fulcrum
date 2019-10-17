@@ -30,14 +30,13 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
     @Override
     public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
         Object collection = validate(context);
-        if (collection == null) if (collection instanceof Map) {
+         if (collection instanceof Map) {
             return processMap(context, (Map) collection);
         } else if (collection instanceof Collection) {
             return processCollection(context, (Collection) collection);
         } else {
             throw new ScriptFailedException("The type of <" + collectionName + "> can not be used" + " in foreach script, expected Map or Collection!");
         }
-        return null;
     }
 
     private StringBuilder processMap(ExecuteContext context, Map target) throws ScriptFailedException {
@@ -71,7 +70,7 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
             throw new ScriptFailedException("No child ScriptHandler exist in execution tree!");
         }
 
-        if (context.getParams().containsParam(collectionName))
+        if (!context.getParams().containsParam(collectionName))
             throw new ScriptFailedException("The param <" + collectionName + "> can not be " + "founded!");
 
         Object collection;
