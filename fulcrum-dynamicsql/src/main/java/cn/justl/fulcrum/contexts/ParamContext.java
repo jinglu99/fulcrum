@@ -1,8 +1,14 @@
 package cn.justl.fulcrum.contexts;
 
+import cn.justl.fulcrum.parsers.exceptions.ScriptFailedException;
 import com.sun.istack.internal.Nullable;
+import java.lang.reflect.Array;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.MapUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @Date : 2019/9/27
@@ -18,9 +24,9 @@ public class ParamContext {
         globalContext.reset(params);
         return this;
     }
+
     /**
      * this method must be called before a temp param being added to the context
-     * @return
      */
     public ParamContext prepareTempParamsContext() {
         contexts.add(new Context());
@@ -39,7 +45,6 @@ public class ParamContext {
 
     /**
      * used to pop the temp context from running context
-     * @return
      */
     public ParamContext popTempParams() {
         contexts.removeLast();
@@ -47,15 +52,8 @@ public class ParamContext {
     }
 
     @Nullable
-    public Object getParam(String name) {
-        Iterator iterator = contexts.descendingIterator();
-        while (iterator.hasNext()) {
-            Context cur = (Context) iterator.next();
-            if (cur.contains(name))
-                return cur.getParam(name);
-        }
-
-        return globalContext.getParam(name);
+    public Object getParam(String placeHolder) throws ScriptFailedException {
+        return resolveParam(placeHolder);
     }
 
     public Map getCombinedParams() {
@@ -68,18 +66,115 @@ public class ParamContext {
         return params;
     }
 
-    public boolean containsParam(String name) {
-        Iterator iterator = contexts.descendingIterator();
-        while (iterator.hasNext()) {
-            if (((Context)iterator.next()).contains(name))
-                return true;
+    public boolean containsParam(String placeHolder) {
+        try {
+            getParam(placeHolder);
+            return true;
+        } catch (ScriptFailedException e) {
+            return false;
         }
-
-        return globalContext.contains(name);
     }
 
+    private Object resolveParam(String placeHolder) throws ScriptFailedException {
+        String param = placeHolder.indexOf(".") < 0 ? placeHolder : placeHolder.substring(0, placeHolder.indexOf("."));
+        try {
+            Object obj = resolveTrueParam(param);
+
+            String resolvingName = placeHolder.indexOf(".") < 0 ? "" : placeHolder.substring(placeHolder.indexOf(".") + 1);
+
+            int index = -1;
+            while (StringUtils.isNotBlank(resolvingName)) {
+                if((index = resolvingName.indexOf(".")) >= 0) {
+                    param = resolvingName.substring(0, index);
+                    resolvingName = resolvingName.substring(index + 1);
+                } else {
+                    param = resolvingName;
+                    resolvingName = "";
+                }
+                obj = MapUtils.getObject(describeObj(obj), param);
+            }
+
+            return obj;
+
+        } catch (Exception e) {
+            throw new ScriptFailedException("placeholder <" + placeHolder + "> can't be resolved!",
+                e);
+        }
+
+    }
+
+    private Object resolveTrueParam(String placeHolder) throws ScriptFailedException {
+        if (isArrayType(placeHolder)) {
+            return resolveArrayParam(placeHolder);
+        } else {
+            return resolveObjParam(placeHolder);
+        }
+    }
+
+    private Object resolveObjParam(String placeHolder) throws ScriptFailedException {
+        Iterator iterator = contexts.descendingIterator();
+        while (iterator.hasNext()) {
+            Context cur = (Context) iterator.next();
+            if (cur.contains(placeHolder)) {
+                return cur.getParam(placeHolder);
+            }
+        }
+
+        if (globalContext.contains(placeHolder)) {
+            return globalContext.getParam(placeHolder);
+        } else {
+            throw new ScriptFailedException("param <\" + placeHolder + \"> not exist!");
+        }
+    }
+
+    private Object resolveArrayParam(String placeHolder) throws ScriptFailedException {
+        String indexStr = getArrayIndexStr(placeHolder);
+        Object obj = resolveObjParam(getArrayParamKey(placeHolder));
+        while (isArrayType(indexStr)) {
+            if (obj.getClass().isArray()) {
+                obj = Array.get(obj, getArrayIndex(indexStr));
+            } else if (obj instanceof List) {
+                obj = ((List) obj).get(getArrayIndex(indexStr));
+            } else {
+                throw new ScriptFailedException(placeHolder + " is not an Array or a List object");
+            }
+
+            indexStr = indexStr.substring(indexStr.indexOf("]" + 1));
+        }
+
+        return obj;
+    }
+
+    private static Map describeObj(Object object)
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        if (object instanceof Map) return (Map) object;
+        else return BeanUtils.describe(object);
+    }
+
+    private static boolean isArrayType(String paramName) {
+        return paramName.contains("[") && paramName.contains("]");
+    }
+
+    private static int getArrayIndex(String paramName) {
+        return Integer
+            .parseInt(paramName.substring(paramName.indexOf("[") + 1, paramName.indexOf("]")));
+    }
+
+    private static String getArrayIndexStr(String placeHolder) {
+        return placeHolder.substring(placeHolder.indexOf("["));
+    }
+
+    private static String getArrayParamKey(String placeHolder) {
+        return placeHolder.substring(0, placeHolder.indexOf("["));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(isArrayType("a[1]"));
+        System.out.println(getArrayIndex("a[1]"));
+    }
 
     private static class Context {
+
         Map<String, Object> params;
 
         public Context() {

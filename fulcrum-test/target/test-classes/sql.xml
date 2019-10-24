@@ -9,14 +9,14 @@
             and a = {$a}
         </case>
         <else>
-            and a = 1
+            and b = {$a}
         </else>
     </if>
     and ( 1!=1
     <for collection='list' item='item'>
         <if>
             <case cond="item!=nil">
-                or a = {item.a}
+                or a = {$item.a}
             </case>
             <else>
                 or a = ''

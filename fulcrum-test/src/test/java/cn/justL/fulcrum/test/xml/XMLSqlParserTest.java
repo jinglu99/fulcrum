@@ -31,7 +31,7 @@ public class XMLSqlParserTest {
                 put("a",2);
             }});
             add(new HashMap() {{
-                put("a",3);
+                put("a","3");
             }});
         }});
 
@@ -42,5 +42,6 @@ public class XMLSqlParserTest {
         ScriptHandler scriptHandler = parser.parse();
         StringBuilder process = scriptHandler.process(context);
         System.out.println(process.toString());
+        System.out.println(context.getSqlParamList());
     }
 }

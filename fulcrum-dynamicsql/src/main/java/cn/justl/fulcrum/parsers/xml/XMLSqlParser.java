@@ -4,8 +4,6 @@ import cn.justl.fulcrum.parsers.exceptions.XmlParseException;
 import cn.justl.fulcrum.parsers.handlers.*;
 import cn.justl.fulcrum.parsers.objs.enums.XmlElements;
 import cn.justl.fulcrum.parsers.utils.JavaCodeUtils;
-import org.apache.commons.beanutils.converters.SqlDateConverter;
-import org.apache.commons.collections.MapUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -20,8 +18,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Date : 2019/9/27
