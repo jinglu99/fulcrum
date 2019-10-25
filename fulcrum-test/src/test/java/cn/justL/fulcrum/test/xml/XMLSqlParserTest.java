@@ -23,7 +23,7 @@ import java.util.Map;
 public class XMLSqlParserTest {
 
     @Test
-    public void XMLSqlParserSimpleTest() throws IOException, SAXException, ParserConfigurationException, XPathExpressionException, XmlParseException, ScriptFailedException {
+    public void XMLSqlParserSimpleTest() throws  XmlParseException, ScriptFailedException {
         Map param = new HashMap();
         param.put("a", 1);
         param.put("list", new ArrayList() {{
@@ -40,6 +40,7 @@ public class XMLSqlParserTest {
 
         XMLSqlParser parser = new XMLSqlParser(XMLSqlParser.class.getResourceAsStream("/sql.xml"));
         ScriptHandler scriptHandler = parser.parse();
+
         StringBuilder process = scriptHandler.process(context);
         System.out.println(process.toString());
         System.out.println(context.getSqlParamList());

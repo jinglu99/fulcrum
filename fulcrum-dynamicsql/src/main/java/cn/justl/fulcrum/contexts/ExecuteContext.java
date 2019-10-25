@@ -11,7 +11,7 @@ import java.util.List;
 public class ExecuteContext {
     private final ParamContext params = new ParamContext();
 
-    private List<Object> sqlParamList = new ArrayList<>();
+    private final List<Object> sqlParamList = new ArrayList<>();
 
     public ParamContext getParams() {
         return params;
