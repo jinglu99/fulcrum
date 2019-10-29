@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.parsers.exceptions;
+package cn.justl.fulcrum.exceptions;
 
 /**
  * @Date : 2019/9/27

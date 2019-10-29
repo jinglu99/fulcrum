@@ -11,13 +11,13 @@ import java.util.List;
 public class ExecuteContext {
     private final ParamContext params = new ParamContext();
 
-    private final List<Object> sqlParamList = new ArrayList<>();
+    private final List<ValueHolder> sqlParamList = new ArrayList<>();
 
     public ParamContext getParams() {
         return params;
     }
 
-    public List<Object> getSqlParamList() {
+    public List<ValueHolder> getSqlParamList() {
         return sqlParamList;
     }
 }

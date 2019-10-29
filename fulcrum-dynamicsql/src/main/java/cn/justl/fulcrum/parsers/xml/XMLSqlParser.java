@@ -1,9 +1,8 @@
 package cn.justl.fulcrum.parsers.xml;
 
-import cn.justl.fulcrum.parsers.exceptions.XmlParseException;
+import cn.justl.fulcrum.exceptions.XmlParseException;
 import cn.justl.fulcrum.parsers.handlers.*;
 import cn.justl.fulcrum.parsers.objs.enums.XmlElements;
-import cn.justl.fulcrum.parsers.utils.JavaCodeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -30,9 +29,6 @@ public class XMLSqlParser {
     private DocumentBuilder builder = null;
     private Document doc = null;
     private XPath xPath = null;
-
-    private StringBuilder codeBuilder = JavaCodeUtils.start();
-
 
     private ScriptHandler scriptHandler;
 

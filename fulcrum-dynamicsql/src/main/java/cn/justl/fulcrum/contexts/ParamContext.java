@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.contexts;
 
-import cn.justl.fulcrum.parsers.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import com.sun.istack.internal.Nullable;
 import java.lang.reflect.Array;
 import org.apache.commons.beanutils.BeanUtils;

@@ -1,7 +1,9 @@
 package cn.justl.fulcrum.parsers.handlers;
 
 import cn.justl.fulcrum.contexts.ExecuteContext;
-import cn.justl.fulcrum.parsers.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.contexts.ValueHolder;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.parsers.utils.ValueELResolver;
 
 /**
  * @Date : 2019/9/27
@@ -26,13 +28,25 @@ public final class TextScriptHandler extends AbstractScriptHandler {
     }
 
     private static StringBuilder resolveText(StringBuilder textBuilder, ExecuteContext context)
-        throws ScriptFailedException {
+            throws ScriptFailedException {
         int start, end;
+        String exp = null;
         if ((start = textBuilder.indexOf("{$")) > 0 && (end = textBuilder.indexOf("}")) > 0) {
-            Object obj = context.getParams().getParam(textBuilder.substring(start + 2, end));
-            textBuilder.replace(start, end + 1, "?");
-            context.getSqlParamList().add(obj);
+            try {
+                exp = textBuilder.substring(start + 2, end);
+                ValueHolder valueHolder = ValueELResolver.getValueHolder(x -> {
+                    try {
+                        return context.getParams().getParam(x);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                }, exp);
 
+                textBuilder.replace(start, end + 1, "?");
+                context.getSqlParamList().add(valueHolder);
+            } catch (Exception e) {
+                throw new ScriptFailedException("<" + exp + "> can't be resolved", e);
+            }
             return resolveText(textBuilder, context);
         } else {
             return textBuilder;

@@ -1,16 +1,12 @@
 package cn.justL.fulcrum.test.xml;
 
 import cn.justl.fulcrum.contexts.ExecuteContext;
-import cn.justl.fulcrum.parsers.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.parsers.exceptions.XmlParseException;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.exceptions.XmlParseException;
 import cn.justl.fulcrum.parsers.handlers.ScriptHandler;
 import cn.justl.fulcrum.parsers.xml.XMLSqlParser;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

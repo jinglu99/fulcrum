@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.parsers.handlers;
 
 import cn.justl.fulcrum.contexts.ExecuteContext;
-import cn.justl.fulcrum.parsers.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
 import java.util.Collection;
 import java.util.Map;

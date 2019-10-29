@@ -1,6 +1,10 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
+import cn.justl.fulcrum.contexts.ValueHolder;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
+
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @Date : 2019/10/25
@@ -9,18 +13,29 @@ import java.sql.PreparedStatement;
  */
 public class OtherTypeHandler extends AbstractTypeHandler {
 
-    @Override
-    public void setNonNullParam(PreparedStatement ps, int index, Object val) {
+    private static OtherTypeHandler instance = new OtherTypeHandler();
 
+    public static OtherTypeHandler getInstance() {
+        return instance;
+    }
+
+    public void setNonNullParam(PreparedStatement ps, int index, Object val) throws SQLException {
+        ps.setObject(index, val);
     }
 
     @Override
-    public void setNullParam(PreparedStatement ps, int index) {
+    void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLException, ScriptFailedException {
+        ps.setString(index, valueHolder.getDefaultExp());
+    }
 
+
+    @Override
+    public boolean isMatchByType(ValueHolder valueHolder) {
+        return true;
     }
 
     @Override
-    public boolean isMatch(Object val) {
+    public boolean isMatchByTypeName(ValueHolder valueHolder) {
         return true;
     }
 }
