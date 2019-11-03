@@ -6,7 +6,6 @@ jdk:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - echo "${COVERALLS_TOKEN}"
   - mvn coveralls:report -DrepoToken="${COVERALLS_TOKEN}"
 
 env:
