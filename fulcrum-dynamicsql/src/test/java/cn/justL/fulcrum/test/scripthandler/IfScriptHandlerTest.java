@@ -75,15 +75,4 @@ public class IfScriptHandlerTest {
             handler.process(context);
         });
     }
-
-
-    @BeforeAll
-    public static void start() {
-        System.out.println("start IfScriptHandlerTest...");
-    }
-
-    @AfterAll
-    public static void end() {
-        System.out.println("All tests in IfScriptHandlerTest are executed!");
-    }
 }

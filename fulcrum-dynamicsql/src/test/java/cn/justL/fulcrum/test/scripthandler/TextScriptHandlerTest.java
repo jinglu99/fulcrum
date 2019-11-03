@@ -61,15 +61,4 @@ public class TextScriptHandlerTest {
         assertNull(name1.getType());
         assertNull(name1.getDefaultExp());
     }
-
-
-    @BeforeAll
-    public static void start() {
-        System.out.println("start TextScriptHandlerTest...");
-    }
-
-    @AfterAll
-    public static void end() {
-        System.out.println("All tests in TextScriptHandlerTest are executed!");
-    }
 }
