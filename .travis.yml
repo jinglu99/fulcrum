@@ -5,4 +5,9 @@ jdk:
 script: "mvn cobertura:cobertura"
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -t b7210b07-a7ff-4930-ae79-98a4471b30b7
+  - bash <(curl -s https://codecov.io/bash)
+  - mvn coveralls:report -DrepoToken="${COVERALLS_TOKEN}"
+
+env:
+  global:
+    - secure: "cN706GAOb4cuwOrO64asjPtVKDxBqnx1nOpCndLPGZGR2bg5fN3x+sCrbih8/6vWKN5rG36/B9ZCloqUyT6RiM+OVyfLRDiMMX8zW2XpLwprB0loaGtlzG52TUOu1tIvCNlpdxYu4paxnd94Htxf/0T9NewBgRYPfqOQicTTUwz3NMkaLFI+cltZjoA0W+AmkZpiPxrWirw1eNwDz/HEoSRluAdhquPxIzxlFzBsTJ3cpCmOBIdMFqEtEpaQaNSCbg3Hzpv9ymrqIbVqstaSey3Ra01BWcWwTjAATjFCMVAiJFwRIgJVbgkL3xV6dRQzC83tY6Ih4JRG4YiWM4Y8zYUdNvGAVOTPERK7c8mrt9N/dlGFMZqk09sPsY3L4kyE2TSb1wctX1nBA85kjIjOTm+VvgW+z6VAPifFaYk5AX1E5sK6SbE5oVNISdH2wiWAQXbOgxwMaM/gQPSjwK30FHmUvaZpqlpqPSAX+1Z01P2r5DNoPWZfklcfEUnI97J4sG1O3VjmpdEgks+P3488Css71LxMX1J54xAAO0bCElAwPNIYmI0HQrHZL4TVEYxsquGrc2UxbrjOucrg94t1MJtthPvOL/WZzoAKuo0eCoMjAG3a2dbTnvO/EmG7vqZwT96hbMYrfR78dGEBFnBNPLnAlMcRZQvhyZUuNHym00c="
