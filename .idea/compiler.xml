@@ -6,8 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="fulcrumdynamicsql" />
+        <module name="fulcrum-dynamicsql" />
+        <module name="fulcrum-test" />
         <module name="fulcrumtest" />
+        <module name="fulcrumdynamicsql" />
       </profile>
     </annotationProcessing>
   </component>
