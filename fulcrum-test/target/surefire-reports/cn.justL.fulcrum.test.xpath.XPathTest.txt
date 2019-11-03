@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: cn.justL.fulcrum.test.xpath.XPathTest
--------------------------------------------------------------------------------
-Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s - in cn.justL.fulcrum.test.xpath.XPathTest

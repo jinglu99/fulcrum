@@ -21,6 +21,11 @@
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
     </properties>
 
+    <dependencies>
+
+
+    </dependencies>
+
 
     <dependencyManagement>
         <dependencies>
@@ -68,19 +73,8 @@
                     <check />
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
         </plugins>
 
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>Codehaus repository</id>
-            <url>http://repository.codehaus.org/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>
