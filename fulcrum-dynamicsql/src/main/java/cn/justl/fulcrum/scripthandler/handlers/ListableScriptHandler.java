@@ -1,7 +1,10 @@
-package cn.justl.fulcrum.parsers.handlers;
+package cn.justl.fulcrum.scripthandler.handlers;
 
+import cn.justl.fulcrum.contexts.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.contexts.ExecuteContext;
+import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.scripthandler.ScriptResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,11 @@ public class ListableScriptHandler extends AbstractScriptHandler {
             sb.append(scriptHandler.process(context));
         }
         return sb;
+    }
+
+    @Override
+    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
+        return null;
     }
 
     public ListableScriptHandler addNext(ScriptHandler scriptHandler) {

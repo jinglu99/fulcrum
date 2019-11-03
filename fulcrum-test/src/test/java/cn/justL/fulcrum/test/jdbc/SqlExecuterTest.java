@@ -4,14 +4,13 @@ import cn.justl.fulcrum.contexts.ExecuteContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.exceptions.XmlParseException;
 import cn.justl.fulcrum.jdbc.SqlExecutor;
-import cn.justl.fulcrum.parsers.xml.XMLSqlParser;
+import cn.justl.fulcrum.parsers.XMLSqlParser;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

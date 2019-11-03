@@ -9,11 +9,11 @@ import java.util.List;
  * @Desc :
  */
 public class ExecuteContext {
-    private final ParamContext params = new ParamContext();
+    private final ScriptContext params = new ScriptContext();
 
     private final List<ValueHolder> sqlParamList = new ArrayList<>();
 
-    public ParamContext getParams() {
+    public ScriptContext getParams() {
         return params;
     }
 

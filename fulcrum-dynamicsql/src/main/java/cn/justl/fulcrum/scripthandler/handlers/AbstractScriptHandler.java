@@ -1,4 +1,10 @@
-package cn.justl.fulcrum.parsers.handlers;
+package cn.justl.fulcrum.scripthandler.handlers;
+
+import cn.justl.fulcrum.contexts.ExecuteContext;
+import cn.justl.fulcrum.contexts.ScriptContext;
+import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.scripthandler.ScriptResult;
 
 /**
  * @Date : 2019/9/27
@@ -8,6 +14,11 @@ package cn.justl.fulcrum.parsers.handlers;
 public abstract class AbstractScriptHandler implements ScriptHandler {
     protected ScriptHandler parent = null;
     protected ScriptHandler child = null;
+
+    @Override
+    public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
+        return null;
+    }
 
     @Override
     public ScriptHandler getChild() {

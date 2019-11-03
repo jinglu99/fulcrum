@@ -1,13 +1,15 @@
 package cn.justl.fulcrum.contexts;
 
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import com.sun.istack.internal.Nullable;
+
 import java.lang.reflect.Array;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MapUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -15,53 +17,63 @@ import org.apache.commons.lang3.StringUtils;
  * @Author : jingl.wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class ParamContext {
+public class ScriptContext {
 
-    private final Context globalContext = new Context();
-    private final Deque<Context> contexts = new LinkedList<>();
+    /**
+     * to store global params
+     */
+    private final ParamContext globalParamContext = new ParamContext();
 
-    public ParamContext setParams(Map params) {
-        globalContext.reset(params);
+    /**
+     * a ParamContext stack to store temp params generate in each scriptHandler
+     */
+    private final Deque<ParamContext> paramContexts = new LinkedList<>();
+
+    private final List<ValueHolder> sqlParamList = new ArrayList<>();
+
+    private StringBuilder sql = null;
+
+    public ScriptContext setParams(Map params) {
+        globalParamContext.reset(params);
         return this;
     }
 
     /**
      * this method must be called before a temp param being added to the context
      */
-    public ParamContext prepareTempParamsContext() {
-        contexts.add(new Context());
+    public ScriptContext prepareTempParamsContext() {
+        paramContexts.add(new ParamContext());
         return this;
     }
 
-    public ParamContext addTempParams(Map params) {
-        contexts.getLast().params.putAll(params);
+    public ScriptContext addTempParams(Map params) {
+        paramContexts.getLast().params.putAll(params);
         return this;
     }
 
-    public ParamContext addTempParam(String key, Object val) {
-        contexts.getLast().setParam(key, val);
+    public ScriptContext addTempParam(String key, Object val) {
+        paramContexts.getLast().setParam(key, val);
         return this;
     }
 
     /**
      * used to pop the temp context from running context
      */
-    public ParamContext popTempParams() {
-        contexts.removeLast();
+    public ScriptContext popTempParams() {
+        paramContexts.removeLast();
         return this;
     }
 
-    @Nullable
     public Object getParam(String placeHolder) throws ScriptFailedException {
         return resolveParam(placeHolder);
     }
 
     public Map getCombinedParams() {
         Map params = new HashMap();
-        params.putAll(globalContext.params);
+        params.putAll(globalParamContext.params);
 
-        for (Context context : contexts) {
-            params.putAll(context.params);
+        for (ParamContext paramContext : paramContexts) {
+            params.putAll(paramContext.params);
         }
         return params;
     }
@@ -84,7 +96,7 @@ public class ParamContext {
 
             int index = -1;
             while (StringUtils.isNotBlank(resolvingName)) {
-                if((index = resolvingName.indexOf(".")) >= 0) {
+                if ((index = resolvingName.indexOf(".")) >= 0) {
                     param = resolvingName.substring(0, index);
                     resolvingName = resolvingName.substring(index + 1);
                 } else {
@@ -98,7 +110,7 @@ public class ParamContext {
 
         } catch (Exception e) {
             throw new ScriptFailedException("placeholder <" + placeHolder + "> can't be resolved!",
-                e);
+                    e);
         }
 
     }
@@ -112,16 +124,16 @@ public class ParamContext {
     }
 
     private Object resolveObjParam(String placeHolder) throws ScriptFailedException {
-        Iterator iterator = contexts.descendingIterator();
+        Iterator iterator = paramContexts.descendingIterator();
         while (iterator.hasNext()) {
-            Context cur = (Context) iterator.next();
+            ParamContext cur = (ParamContext) iterator.next();
             if (cur.contains(placeHolder)) {
                 return cur.getParam(placeHolder);
             }
         }
 
-        if (globalContext.contains(placeHolder)) {
-            return globalContext.getParam(placeHolder);
+        if (globalParamContext.contains(placeHolder)) {
+            return globalParamContext.getParam(placeHolder);
         } else {
             throw new ScriptFailedException("param <\" + placeHolder + \"> not exist!");
         }
@@ -139,14 +151,16 @@ public class ParamContext {
                 throw new ScriptFailedException(placeHolder + " is not an Array or a List object");
             }
 
-            indexStr = indexStr.substring(indexStr.indexOf("]" + 1));
+            if (indexStr.length() == indexStr.indexOf("]") + 1) break;
+            else
+                indexStr = indexStr.substring(indexStr.indexOf("]" + 1));
         }
 
         return obj;
     }
 
     private static Map describeObj(Object object)
-        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         if (object instanceof Map) return (Map) object;
         else return BeanUtils.describe(object);
     }
@@ -157,7 +171,7 @@ public class ParamContext {
 
     private static int getArrayIndex(String paramName) {
         return Integer
-            .parseInt(paramName.substring(paramName.indexOf("[") + 1, paramName.indexOf("]")));
+                .parseInt(paramName.substring(paramName.indexOf("[") + 1, paramName.indexOf("]")));
     }
 
     private static String getArrayIndexStr(String placeHolder) {
@@ -168,29 +182,42 @@ public class ParamContext {
         return placeHolder.substring(0, placeHolder.indexOf("["));
     }
 
+    public List<ValueHolder> getSqlParamList() {
+        return sqlParamList;
+    }
+
+
+    public StringBuilder getSql() {
+        return sql;
+    }
+
+    public void setSql(StringBuilder sql) {
+        this.sql = sql;
+    }
+
     public static void main(String[] args) {
         System.out.println(isArrayType("a[1]"));
         System.out.println(getArrayIndex("a[1]"));
     }
 
-    private static class Context {
+    private static class ParamContext {
 
         Map<String, Object> params;
 
-        public Context() {
+        public ParamContext() {
             this(null);
         }
 
-        public Context(Map<String, Object> params) {
+        public ParamContext(Map<String, Object> params) {
             this.params = Optional.ofNullable(params).orElse(new HashMap<>());
         }
 
-        public Context reset(Map<String, Object> params) {
+        public ParamContext reset(Map<String, Object> params) {
             this.params = Optional.of(params).orElse(Collections.emptyMap());
             return null;
         }
 
-        public Context setParam(String key, Object val) {
+        public ParamContext setParam(String key, Object val) {
             params.put(key, val);
             return this;
         }

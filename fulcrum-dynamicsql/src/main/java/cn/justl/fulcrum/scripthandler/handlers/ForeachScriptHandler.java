@@ -1,7 +1,10 @@
-package cn.justl.fulcrum.parsers.handlers;
+package cn.justl.fulcrum.scripthandler.handlers;
 
 import cn.justl.fulcrum.contexts.ExecuteContext;
+import cn.justl.fulcrum.contexts.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.scripthandler.ScriptResult;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +31,7 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
     }
 
     @Override
-    public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
+    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
         Object collection = validate(context);
          if (collection instanceof Map) {
             return processMap(context, (Map) collection);
@@ -39,57 +42,62 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
         }
     }
 
-    private StringBuilder processMap(ExecuteContext context, Map target) throws ScriptFailedException {
-        return doProcess(context, target.keySet().toArray());
+    private ScriptResult processMap(ScriptContext context, Map target) throws ScriptFailedException {
+        return doProcess(context, target.entrySet().toArray());
     }
 
-    private StringBuilder processCollection(ExecuteContext context, Collection target) throws ScriptFailedException {
+    private ScriptResult processCollection(ScriptContext context, Collection target) throws ScriptFailedException {
         return doProcess(context, target.toArray());
     }
 
-    private StringBuilder doProcess(ExecuteContext context, Object[] items) throws ScriptFailedException {
-        StringBuilder sb = new StringBuilder();
+    private ScriptResult doProcess(ScriptContext context, Object[] items) throws ScriptFailedException {
+        ScriptResult sr = new ScriptResult();
+        sr.setSql(new StringBuilder());
+        boolean needSeparator = false;
         for (int i = 0; i < items.length; i++) {
             try {
                 prepareParam(context, items[i], i);
-                StringBuilder subBuilder = getChild().process(context);
-                if (subBuilder == null) continue;
+                ScriptResult subRs = getChild().process(context);
+                if (subRs == null || subRs instanceof ScriptResult.EmptyScriptResult || StringUtils.isBlank(subRs.getSql())) continue;
 
-                if (i != 0 && separator != null && !separator.equals(""))
-                    sb.append(separator);
-                sb.append(subBuilder);
+                if (needSeparator && StringUtils.isNotBlank(separator))
+                    sr.getSql().append(separator);
+                else if (!needSeparator)
+                    needSeparator = true;
+                sr.getSql().append(subRs.getSql());
+                sr.addAllValue(subRs.getValueHolders());
             } finally {
                 clearParam(context);
             }
         }
-        return sb;
+        return sr;
     }
 
-    private Object validate(ExecuteContext context) throws ScriptFailedException {
+    private Object validate(ScriptContext context) throws ScriptFailedException {
         if (getChild() == null) {
             throw new ScriptFailedException("No child ScriptHandler exist in execution tree!");
         }
 
-        if (!context.getParams().containsParam(collectionName))
+        if (!context.containsParam(collectionName))
             throw new ScriptFailedException("The param <" + collectionName + "> can not be " + "founded!");
 
         Object collection;
-        if ((collection = context.getParams().getParam(collectionName)) == null)
+        if ((collection = context.getParam(collectionName)) == null)
             throw new ScriptFailedException("The param <" + collectionName + "> must not be Null!");
 
         return collection;
     }
 
-    private void prepareParam(ExecuteContext context, Object item, int index) {
-        context.getParams().prepareTempParamsContext();
-        context.getParams().addTempParam(itemName, item);
+    private void prepareParam(ScriptContext context, Object item, int index) {
+        context.prepareTempParamsContext();
+        context.addTempParam(itemName, item);
         Optional.ofNullable(indexName).ifPresent(x -> {
-            context.getParams().addTempParam(x, index);
+            context.addTempParam(x, index);
         });
     }
 
-    private void clearParam(ExecuteContext context) {
-        context.getParams().popTempParams();
+    private void clearParam(ScriptContext context) {
+        context.popTempParams();
     }
 
     @Override

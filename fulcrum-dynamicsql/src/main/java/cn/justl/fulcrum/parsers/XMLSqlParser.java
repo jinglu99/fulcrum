@@ -1,8 +1,11 @@
-package cn.justl.fulcrum.parsers.xml;
+package cn.justl.fulcrum.parsers;
 
 import cn.justl.fulcrum.exceptions.XmlParseException;
-import cn.justl.fulcrum.parsers.handlers.*;
-import cn.justl.fulcrum.parsers.objs.enums.XmlElements;
+import cn.justl.fulcrum.scripthandler.*;
+import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
+import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
+import cn.justl.fulcrum.scripthandler.handlers.ListableScriptHandler;
+import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

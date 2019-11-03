@@ -3,8 +3,8 @@ package cn.justL.fulcrum.test.xml;
 import cn.justl.fulcrum.contexts.ExecuteContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.exceptions.XmlParseException;
-import cn.justl.fulcrum.parsers.handlers.ScriptHandler;
-import cn.justl.fulcrum.parsers.xml.XMLSqlParser;
+import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.parsers.XMLSqlParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

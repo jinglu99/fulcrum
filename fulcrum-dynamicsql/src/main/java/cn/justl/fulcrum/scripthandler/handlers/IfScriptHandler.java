@@ -1,7 +1,10 @@
-package cn.justl.fulcrum.parsers.handlers;
+package cn.justl.fulcrum.scripthandler.handlers;
 
 import cn.justl.fulcrum.contexts.ExecuteContext;
+import cn.justl.fulcrum.contexts.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.scripthandler.ScriptResult;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 
@@ -17,13 +20,13 @@ public final class IfScriptHandler extends AbstractScriptHandler {
     private final List<Case> cazes = new ArrayList();
 
     @Override
-    public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
+    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
         for (Case caze : cazes) {
             if (caze.isMatch(context)) {
                 return caze.process(context);
             }
         }
-        return null;
+        return ScriptResult.emptyResult();
     }
 
     public IfScriptHandler addCase(String cond, ScriptHandler scriptHandler) {
@@ -56,9 +59,9 @@ public final class IfScriptHandler extends AbstractScriptHandler {
 
         }
 
-        public boolean isMatch(ExecuteContext context) throws ScriptFailedException {
+        public boolean isMatch(ScriptContext context) throws ScriptFailedException {
             try {
-                return (boolean) compiledExp.execute(context.getParams().getCombinedParams());
+                return (boolean) compiledExp.execute(context.getCombinedParams());
             } catch (Exception e) {
                 throw new ScriptFailedException("if condition <" + cond + "> executed failed!", e);
             }
@@ -66,7 +69,7 @@ public final class IfScriptHandler extends AbstractScriptHandler {
         }
 
         @Override
-        public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
+        public ScriptResult process(ScriptContext context) throws ScriptFailedException {
             if (getChild() == null) {
                 throw new ScriptFailedException("No child ScriptHandler exist in execution tree!");
             }
@@ -87,7 +90,7 @@ public final class IfScriptHandler extends AbstractScriptHandler {
         }
 
         @Override
-        public boolean isMatch(ExecuteContext context) {
+        public boolean isMatch(ScriptContext context) {
             return true;
         }
 

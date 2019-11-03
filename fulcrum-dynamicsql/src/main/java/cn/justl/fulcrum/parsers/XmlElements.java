@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.parsers.objs.enums;
+package cn.justl.fulcrum.parsers;
 
 import org.w3c.dom.Node;
 
