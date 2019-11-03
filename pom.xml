@@ -71,6 +71,12 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
+                <pluginRepositories>
+                    <pluginRepository>
+                        <id>Codehaus repository</id>
+                        <url>http://repository.codehaus.org/</url>
+                    </pluginRepository>
+                </pluginRepositories>
             </plugin>
         </plugins>
     </build>
