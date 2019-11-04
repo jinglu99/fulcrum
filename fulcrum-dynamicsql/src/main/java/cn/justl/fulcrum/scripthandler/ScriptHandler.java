@@ -18,8 +18,6 @@ import cn.justl.fulcrum.scripthandler.handlers.*;
  * @see ListableScriptHandler
  */
 public interface ScriptHandler {
-    StringBuilder process(ExecuteContext context) throws ScriptFailedException;
-
     ScriptResult process(ScriptContext context) throws ScriptFailedException;
 
     ScriptHandler getParent();

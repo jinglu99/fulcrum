@@ -8,8 +8,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="fulcrum-dynamicsql" />
         <module name="fulcrum-test" />
-        <module name="fulcrumtest" />
         <module name="fulcrumdynamicsql" />
+        <module name="fulcrumtest" />
       </profile>
     </annotationProcessing>
   </component>

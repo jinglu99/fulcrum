@@ -177,4 +177,38 @@ public class ForeachScriptHandlerTest {
         assertEquals("B", sr.getValueHolders().get(5).getVal());
     }
 
+    @Test
+    public void useBlankSeperator() throws ScriptFailedException {
+        ForeachScriptHandler handler = new ForeachScriptHandler("col", "item", "index", " ");
+        handler.setChild(new TextScriptHandler("{$item}"));
+
+        ScriptContext context = new ScriptContext() {{
+            setParams(new HashMap() {{
+                put("col", Arrays.asList(1,2,3));
+            }});
+        }};
+
+        ScriptResult sr = handler.process(context);
+
+        assertEquals("? ? ?", sr.getSql().toString());
+        assertEquals(3, sr.getValueHolders().size());
+    }
+
+    @Test
+    public void collectionWithNullValueTest() throws ScriptFailedException {
+        ForeachScriptHandler handler = new ForeachScriptHandler("col", "item", "index", " ");
+        handler.setChild(new TextScriptHandler("{$item}"));
+
+        ScriptContext context = new ScriptContext() {{
+            setParams(new HashMap() {{
+                put("col", Arrays.asList(1,null,3));
+            }});
+        }};
+
+        ScriptResult sr = handler.process(context);
+
+        assertEquals("? ?", sr.getSql().toString());
+        assertEquals(2, sr.getValueHolders().size());
+    }
+
 }

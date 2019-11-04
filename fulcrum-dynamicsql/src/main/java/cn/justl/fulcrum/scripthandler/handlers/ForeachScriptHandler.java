@@ -55,12 +55,14 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
         sr.setSql(new StringBuilder());
         boolean needSeparator = false;
         for (int i = 0; i < items.length; i++) {
+            if (null == items[i]) continue;
             try {
                 prepareParam(context, items[i], i);
                 ScriptResult subRs = getChild().process(context);
+
                 if (subRs == null || subRs instanceof ScriptResult.EmptyScriptResult || StringUtils.isBlank(subRs.getSql())) continue;
 
-                if (needSeparator && StringUtils.isNotBlank(separator))
+                if (needSeparator && StringUtils.isNotEmpty(separator))
                     sr.getSql().append(separator);
                 else if (!needSeparator)
                     needSeparator = true;

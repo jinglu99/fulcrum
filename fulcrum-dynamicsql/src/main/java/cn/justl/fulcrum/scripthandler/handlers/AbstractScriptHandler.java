@@ -16,11 +16,6 @@ public abstract class AbstractScriptHandler implements ScriptHandler {
     protected ScriptHandler child = null;
 
     @Override
-    public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
-        return null;
-    }
-
-    @Override
     public ScriptHandler getChild() {
         return child;
     }

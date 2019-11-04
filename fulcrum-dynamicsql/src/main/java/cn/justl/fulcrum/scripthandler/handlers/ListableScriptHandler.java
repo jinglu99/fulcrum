@@ -20,17 +20,17 @@ public class ListableScriptHandler extends AbstractScriptHandler {
     List<ScriptHandler> scriptList = new ArrayList<>();
 
     @Override
-    public StringBuilder process(ExecuteContext context) throws ScriptFailedException {
-        StringBuilder sb = new StringBuilder();
-        for (ScriptHandler scriptHandler : scriptList) {
-            sb.append(scriptHandler.process(context));
-        }
-        return sb;
-    }
-
-    @Override
     public ScriptResult process(ScriptContext context) throws ScriptFailedException {
-        return null;
+        ScriptResult sr = new ScriptResult();
+        sr.setSql(new StringBuilder());
+        for (ScriptHandler scriptHandler : scriptList) {
+            ScriptResult subRs = scriptHandler.process(context);
+            if (subRs == null && subRs instanceof ScriptResult.EmptyScriptResult) continue;
+            sr.getSql().append(subRs.getSql()).append(" ");
+            sr.addAllValue(subRs.getValueHolders());
+        }
+
+        return sr;
     }
 
     public ListableScriptHandler addNext(ScriptHandler scriptHandler) {
