@@ -52,7 +52,6 @@ public class ListableScriptHandlerTest {
         return handler;
     }
 
-
     public static ScriptHandler foreachScriptHandler() {
         ScriptHandler handler = new ForeachScriptHandler("col", "item", "index", " ");
         handler.setChild(new TextScriptHandler("{$item}"));

@@ -1,8 +1,3 @@
-<sql>
-  select
-    *
-  from
-    table
-  where
-    a=1
-</sql>
+<Sql>
+  select * from table where a=1
+</Sql>

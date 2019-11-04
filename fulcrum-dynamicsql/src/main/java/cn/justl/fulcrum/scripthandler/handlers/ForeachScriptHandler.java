@@ -102,6 +102,22 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
         context.popTempParams();
     }
 
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public String getIndexName() {
+        return indexName;
+    }
+
+    public String getSeparator() {
+        return separator;
+    }
+
     @Override
     public String toString() {
         return "ForeachScriptHandler{" + "collectionName='" + collectionName + '\'' + ", itemName='" + itemName + '\'' + ", indexName='" + indexName + '\'' + ", separator='" + separator + '\'' + ", child=" + child + '}';

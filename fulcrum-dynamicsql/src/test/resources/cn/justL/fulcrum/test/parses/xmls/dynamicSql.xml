@@ -1,0 +1,21 @@
+<Sql>
+    select * from table
+    where 1 = 1
+    <if>
+        <case cond="a != nil">
+            and a = {$a}
+        </case>
+        <else>
+            and a is null
+        </else>
+    </if>
+    <if>
+        <case cond="items != nil">
+            and ( 1 = 2
+            <for collection="items" item="item">
+                or item = {$item}
+            </for>
+            )
+        </case>
+    </if>
+</Sql>

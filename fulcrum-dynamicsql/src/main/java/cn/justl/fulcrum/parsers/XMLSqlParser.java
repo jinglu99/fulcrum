@@ -6,6 +6,7 @@ import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.ListableScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -70,7 +71,7 @@ public class XMLSqlParser {
         ListableScriptHandler scriptHandler = new ListableScriptHandler();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node child = nodeList.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE) {
+            if (child.getNodeType() == Node.TEXT_NODE && StringUtils.isNotBlank(child.getTextContent())) {
                 scriptHandler.addNext(new TextScriptHandler(child.getTextContent()));
             } else if (child.getNodeType() == Node.ELEMENT_NODE) {
                 scriptHandler.addNext(parseElement(child));

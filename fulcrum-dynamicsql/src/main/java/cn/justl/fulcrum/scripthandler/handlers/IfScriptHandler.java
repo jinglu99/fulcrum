@@ -43,12 +43,20 @@ public final class IfScriptHandler extends AbstractScriptHandler {
         return this;
     }
 
+    /**
+     * return a copy of cases
+     * @return
+     */
+    public List<Case> getCases() {
+        return new ArrayList<>(cazes);
+    }
+
     @Override
     public String toString() {
         return "IfScriptHandler{" + "cases=" + cazes + '}';
     }
 
-    private static class Case extends AbstractScriptHandler {
+    public static class Case extends AbstractScriptHandler {
         private final String cond;
         private final Expression compiledExp;
 
@@ -77,13 +85,17 @@ public final class IfScriptHandler extends AbstractScriptHandler {
             return getChild().process(context);
         }
 
+        public String getCond() {
+            return cond;
+        }
+
         @Override
         public String toString() {
             return "Case{" + "cond='" + cond + '\'' + ", child=" + child + '}';
         }
     }
 
-    private static class Else extends Case {
+    public static class Else extends Case {
 
         public Else() {
             super(null);
