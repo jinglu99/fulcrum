@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.contexts.ValueHolder;
+import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
 import java.sql.PreparedStatement;

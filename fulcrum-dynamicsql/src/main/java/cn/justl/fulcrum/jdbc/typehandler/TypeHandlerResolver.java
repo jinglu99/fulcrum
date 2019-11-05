@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.contexts.ValueHolder;
+import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.jdbc.SupportTypes;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,8 +1,7 @@
 package cn.justl.fulcrum.scripthandler.handlers;
 
-import cn.justl.fulcrum.contexts.ScriptContext;
+import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.contexts.ExecuteContext;
 import cn.justl.fulcrum.scripthandler.ScriptHandler;
 import cn.justl.fulcrum.scripthandler.ScriptResult;
 
