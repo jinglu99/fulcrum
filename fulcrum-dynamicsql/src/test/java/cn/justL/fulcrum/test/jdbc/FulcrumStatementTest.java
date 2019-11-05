@@ -77,16 +77,4 @@ public class FulcrumStatementTest extends DBTest {
             statement.execute();
         });
     }
-
-    @Test
-    @Disabled
-    public void test() throws SQLException {
-        PreparedStatement ps1 = conn.prepareStatement("select * from author ");
-        ResultSet set = ps1.executeQuery();
-        if (set.next()) {
-            System.out.println(set.getObject(1));
-        }
-    }
-
-
 }
