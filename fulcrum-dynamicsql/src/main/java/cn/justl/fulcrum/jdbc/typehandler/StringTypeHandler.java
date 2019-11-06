@@ -2,27 +2,17 @@ package cn.justl.fulcrum.jdbc.typehandler;
 
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.SQLExecuteException;
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
 /**
- * @Date : 2019/10/25
- * @Author : jingl.wang [jingl.wang123@gmail.com]
+ * @Date : 2019-11-06
+ * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class OtherTypeHandler extends AbstractTypeHandler {
-
-    private static OtherTypeHandler instance = new OtherTypeHandler();
-
-    public static OtherTypeHandler getInstance() {
-        return instance;
-    }
-
-
+public class StringTypeHandler extends AbstractTypeHandler {
     @Override
     public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
 

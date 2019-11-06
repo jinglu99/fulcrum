@@ -28,24 +28,23 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class FulcrumStatementTest extends DBTest {
 
-    private static Connection conn;
-    private static ScriptResult sr;
+    private Connection conn;
+    private ScriptResult sr;
 
     @BeforeAll
     public static void setup() throws SQLException, ClassNotFoundException, IOException {
         createBlogDataSource();
-
-        sr = new ScriptResult() {{
-            setSql(new StringBuilder("select * from author where id = ? and username = ?"));
-        }};
-
-        sr.addValue(new ValueHolder("id", 101, null, null));
-        sr.addValue(new ValueHolder("username", "jim", null, null));
     }
 
     @BeforeEach
     public void connect() throws SQLException, ClassNotFoundException {
         conn = createConnection();
+
+        sr = new ScriptResult() {{
+            setSql(new StringBuilder("select * from author where id = ?"));
+        }};
+
+        sr.addValue(new ValueHolder("id", 101, null, null));
     }
 
     @Test
