@@ -2,6 +2,7 @@ package cn.justl.fulcrum.jdbc;
 
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandlerResolver;
 import cn.justl.fulcrum.scripthandler.ScriptResult;
 import org.slf4j.Logger;
@@ -57,8 +58,12 @@ public class FulcrumStatement {
      */
     private void setParams() throws SQLExecuteException {
         for (int i = 0; i < values.size(); i++) {
-            TypeHandlerResolver.resolveTypeHandler(values.get(i))
-                    .setParam(preparedStatement, i + 1, values.get(i));
+            try {
+                TypeHandlerResolver.resolveTypeHandler(values.get(i))
+                        .setParam(preparedStatement, i + 1, values.get(i));
+            } catch (TypeHandleException e) {
+                throw new SQLExecuteException("failed to handle the parameter of executing sql!", e);
+            }
         }
     }
 

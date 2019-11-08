@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
@@ -24,9 +24,9 @@ import java.util.Set;
 public abstract class AbstractTypeHandler implements TypeHandler {
 
     @Override
-    public void setParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
+    public void setParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
         if (valueHolder == null)
-            throw new SQLExecuteException("input valueHolder is null");
+            throw new TypeHandleException("input valueHolder can't be null");
         if (valueHolder.getVal() != null)
             setNonNullParam(ps, index, valueHolder);
         else
@@ -56,18 +56,18 @@ public abstract class AbstractTypeHandler implements TypeHandler {
      * @param ps
      * @param index
      * @param valueHolder
-     * @throws SQLExecuteException
+     * @throws TypeHandleException
      */
-    public abstract void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException;
+    public abstract void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException;
 
     /**
      * To set parameters for null value
      * @param ps
      * @param index
      * @param valueHolder
-     * @throws SQLExecuteException
+     * @throws TypeHandleException
      */
-    public abstract void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException;
+    public abstract void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException;
 
     /**
      * Get the name of support types

@@ -15,7 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @Date : 2019/9/27
  * @Author : jingl.wang [jingl.wang123@gmail.com]
- * @Desc :
+ * @Desc : A container to hold the parameters which input by user or generated in the process of
+ * script execution.
  */
 public class ScriptContext {
 
@@ -88,11 +89,13 @@ public class ScriptContext {
     }
 
     private Object resolveParam(String placeHolder) throws ScriptFailedException {
-        String param = placeHolder.indexOf(".") < 0 ? placeHolder : placeHolder.substring(0, placeHolder.indexOf("."));
+        String param = placeHolder.indexOf(".") < 0 ? placeHolder
+            : placeHolder.substring(0, placeHolder.indexOf("."));
         try {
             Object obj = resolveTrueParam(param);
 
-            String resolvingName = placeHolder.indexOf(".") < 0 ? "" : placeHolder.substring(placeHolder.indexOf(".") + 1);
+            String resolvingName = placeHolder.indexOf(".") < 0 ? ""
+                : placeHolder.substring(placeHolder.indexOf(".") + 1);
 
             int index = -1;
             while (StringUtils.isNotBlank(resolvingName)) {
@@ -110,7 +113,7 @@ public class ScriptContext {
 
         } catch (Exception e) {
             throw new ScriptFailedException("placeholder <" + placeHolder + "> can't be resolved!",
-                    e);
+                e);
         }
 
     }
@@ -151,18 +154,23 @@ public class ScriptContext {
                 throw new ScriptFailedException(placeHolder + " is not an Array or a List object");
             }
 
-            if (indexStr.length() == indexStr.indexOf("]") + 1) break;
-            else
+            if (indexStr.length() == indexStr.indexOf("]") + 1) {
+                break;
+            } else {
                 indexStr = indexStr.substring(indexStr.indexOf("]" + 1));
+            }
         }
 
         return obj;
     }
 
     private static Map describeObj(Object object)
-            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        if (object instanceof Map) return (Map) object;
-        else return BeanUtils.describe(object);
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        if (object instanceof Map) {
+            return (Map) object;
+        } else {
+            return BeanUtils.describe(object);
+        }
     }
 
     private static boolean isArrayType(String paramName) {
@@ -171,7 +179,7 @@ public class ScriptContext {
 
     private static int getArrayIndex(String paramName) {
         return Integer
-                .parseInt(paramName.substring(paramName.indexOf("[") + 1, paramName.indexOf("]")));
+            .parseInt(paramName.substring(paramName.indexOf("[") + 1, paramName.indexOf("]")));
     }
 
     private static String getArrayIndexStr(String placeHolder) {

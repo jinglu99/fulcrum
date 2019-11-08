@@ -2,9 +2,13 @@ package cn.justL.fulcrum.test.jdbc.typehandler;
 
 import cn.justL.fulcrum.test.databases.DBTest;
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.IntegerTypeHandler;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandler;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.util.List;
+import org.hsqldb.jdbc.JDBCPreparedStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,74 +27,84 @@ import java.sql.Types;
  * @Desc :
  */
 @DisplayName("Test for IntegerTypeHandler")
-public class IntegerTypeHandlerTest extends DBTest {
-    private PreparedStatement ps;
+public class IntegerTypeHandlerTest extends TypeHandlerBaseTest {
+    private TestPrepareStatement ps;
+    private List<Object> params;
     private TypeHandler handler = new IntegerTypeHandler();
 
-    @BeforeAll
-    public static void setupDB() throws SQLException, IOException, ClassNotFoundException {
-        createBlogDataSource();
+    @BeforeEach
+    public void createConnAndPS() {
+        ps = new TestPrepareStatement();
+        params = ps.getParams();
     }
 
-    @BeforeEach
-    public void createPrepareStatement() throws SQLException, ClassNotFoundException {
-        ps = createConnection().prepareStatement("select * from author where id = ?");
+    @BeforeAll
+    public static void newDBANDHandler() throws SQLException, IOException, ClassNotFoundException {
+        createBlogDataSource();
     }
 
     @Test
     public void inputNullValueHolder() throws SQLException, ClassCastException {
         assertFalse(handler.isMatch(null));
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(TypeHandleException.class, () -> {
             handler.setParam(ps, 1, null);
         });
     }
 
     @Test
-    public void theTypeOfValueIsByte() throws SQLExecuteException, SQLException {
+    public void theTypeOfValueIsByte() throws TypeHandleException, SQLException {
         ValueHolder holder = new ValueHolder("test", (byte) 1, null, null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Byte.class, params.get(0).getClass());
+        assertEquals((byte)1, params.get(0));
     }
 
     @Test
-    public void theTypeOfValueIsShort() throws SQLExecuteException, SQLException {
+    public void theTypeOfValueIsShort() throws TypeHandleException, SQLException {
         ValueHolder holder = new ValueHolder("test", (short) 1, null, null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Short.class, params.get(0).getClass());
+        assertEquals((short) 1, params.get(0));
     }
 
     @Test
-    public void theTypeOfValueIsInteger() throws SQLExecuteException, SQLException {
+    public void theTypeOfValueIsInteger() throws TypeHandleException, SQLException {
         ValueHolder holder = new ValueHolder("test", 1, null, null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Integer.class, params.get(0).getClass());
+        assertEquals(1, params.get(0));
     }
 
     @Test
-    public void theTypeOfValueIsLong() throws SQLException, SQLExecuteException {
-        ValueHolder holder = new ValueHolder("test", 100l, null, null);
+    public void theTypeOfValueIsLong() throws SQLException, TypeHandleException {
+        ValueHolder holder = new ValueHolder("test", 100L, null, null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Long.class, params.get(0).getClass());
+        assertEquals(100L, params.get(0));
     }
 
     @Test
-    public void theTypeOfValueIsFloat() throws SQLExecuteException, SQLException {
+    public void theTypeOfValueIsFloat() throws TypeHandleException, SQLException {
         ValueHolder holder = new ValueHolder("test", 1.0, null, null);
 
         assertFalse(handler.isMatch(holder));
@@ -98,25 +112,29 @@ public class IntegerTypeHandlerTest extends DBTest {
 
 
     @Test
-    public void numberValueNotSupportTypeButDeclareTypeIsInt() throws SQLException, SQLExecuteException {
+    public void numberValueNotSupportTypeButDeclareTypeIsInt() throws SQLException, TypeHandleException {
         ValueHolder holder = new ValueHolder("test", 1.0, "int", null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Long.class, params.get(0).getClass());
+        assertEquals(1L, params.get(0));
     }
 
     @Test
-    public void stringValueNotSupportTypeButDeclareTypeIsInt() throws SQLException, SQLExecuteException {
+    public void stringValueNotSupportTypeButDeclareTypeIsInt() throws SQLException, TypeHandleException {
         ValueHolder holder = new ValueHolder("test", "1", "int", null);
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Long.class, params.get(0).getClass());
+        assertEquals(1L, params.get(0));
     }
 
     @Test
@@ -125,32 +143,35 @@ public class IntegerTypeHandlerTest extends DBTest {
 
         assertTrue(handler.isMatch(holder));
 
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(TypeHandleException.class, () -> {
             handler.setParam(ps, 1, holder);
         });
     }
 
     @Test
-    public void correctDefaultExpExist() throws SQLException, SQLExecuteException {
+    public void correctDefaultExpExist() throws SQLException, TypeHandleException {
         ValueHolder holder = new ValueHolder("test", null, "int", "1");
 
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
 
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+        assertNotNull(params.get(0));
+        assertEquals(Long.class, params.get(0).getClass());
+        assertEquals(1L, params.get(0));
     }
 
 
     @Test
-    public void incorrectDefaultExp() throws SQLExecuteException, SQLException {
+    public void incorrectDefaultExp() throws TypeHandleException, SQLException {
         ValueHolder holder = new ValueHolder("test", null, "int", "number");
 
         assertTrue(handler.isMatch(holder));
 
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(TypeHandleException.class, () -> {
             handler.setParam(ps, 1, holder);
         });
     }
+
 
 }

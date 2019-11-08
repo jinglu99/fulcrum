@@ -4,6 +4,7 @@ import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.SQLExecuteException;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -25,7 +26,7 @@ public interface TypeHandler {
      * @param valueHolder
      * @throws SQLExecuteException
      */
-    void setParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException;
+    void setParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException;
 
     /**
      *  Whether the {@link ValueHolder} can be handled by current {@link TypeHandler}

@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
 import java.sql.PreparedStatement;
@@ -24,12 +24,12 @@ public class OtherTypeHandler extends AbstractTypeHandler {
 
 
     @Override
-    public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
+    public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
 
     }
 
     @Override
-    public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
+    public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
 
     }
 

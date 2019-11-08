@@ -30,19 +30,5 @@
 //        Class.forName("com.mysql.jdbc.Driver");
 //
 //        Connection conn = DriverManager.getConnection(url, user, passwd);
-//
-//        XMLSqlParser parser = new XMLSqlParser(XMLSqlParser.class.getResourceAsStream("/dbkTestSql.xml"));
-//        SqlExecutor executor = new SqlExecutor(parser.parse(), conn);
-//
-//
-//        Map param = new HashMap();
-////        param.put("price", 1);
-//
-//        ExecuteContext context = new ExecuteContext();
-//        context.getParams().setParams(param);
-//
-//
-//        ResultSet resultSet = (ResultSet) executor.execute(context);
-//        System.out.println(resultSet);
 //    }
 //}

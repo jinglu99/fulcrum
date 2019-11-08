@@ -2,12 +2,16 @@ package cn.justL.fulcrum.test.jdbc.typehandler;
 
 import cn.justL.fulcrum.test.databases.DBTest;
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.jdbc.typehandler.AbstractTypeHandler;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandler;
+import java.lang.reflect.Field;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.SetUtils;
+import org.hsqldb.HsqlException;
+import org.hsqldb.jdbc.JDBCConnection;
+import org.hsqldb.jdbc.JDBCPreparedStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,29 +37,35 @@ import java.util.logging.Handler;
  * @Desc :
  */
 @DisplayName("Test for AbstractTypeHandler")
-public class AbstractTypeHandlerTest extends DBTest {
-    private PreparedStatement ps;
-    private Connection conn;
+public class AbstractTypeHandlerTest extends TypeHandlerBaseTest {
+    private TestPrepareStatement ps;
+    private List<Object> params;
 
     @Test
-    public void typeHandlerTestForOnlyValueExist() throws SQLExecuteException, SQLException {
+    public void typeHandlerTestForOnlyValueExist() throws TypeHandleException, SQLException {
         TypeHandler handler = new IntHandler();
         ValueHolder holder = new ValueHolder("test", 1, null, null);
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+
+        assertNotNull(params.get(0));
+        assertEquals(Integer.class, params.get(0).getClass());
+        assertEquals(1, params.get(0));
     }
 
     @Test
-    public void typeHandlerTestForStringValueAndIntTypeExist() throws SQLExecuteException, SQLException {
+    public void typeHandlerTestForStringValueAndIntTypeExist() throws TypeHandleException, SQLException {
         TypeHandler handler = new IntHandler();
 
         ValueHolder holder = new ValueHolder("test", "1", "int", null);
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+
+        assertNotNull(params.get(0));
+        assertEquals(Integer.class, params.get(0).getClass());
+        assertEquals(1, params.get(0));
     }
 
     @Test
@@ -73,20 +83,23 @@ public class AbstractTypeHandlerTest extends DBTest {
         ValueHolder holder = new ValueHolder("test", null, "int", null);
         assertTrue(handler.isMatch(holder));
 
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(TypeHandleException.class, () -> {
             handler.setParam(ps, 1, holder);
         });
     }
 
     @Test
-    public void typeHandlerTestForNullValueAndTypeAndDefaultExp() throws SQLExecuteException, SQLException {
+    public void typeHandlerTestForNullValueAndTypeAndDefaultExp() throws TypeHandleException, SQLException {
         TypeHandler handler = new IntHandler();
 
         ValueHolder holder = new ValueHolder("test", null, "int", "1");
         assertTrue(handler.isMatch(holder));
 
         handler.setParam(ps, 1, holder);
-        assertEquals(Types.INTEGER, ps.getParameterMetaData().getParameterType(1));
+
+        assertNotNull(params.get(0));
+        assertEquals(Integer.class, params.get(0).getClass());
+        assertEquals(1, params.get(0));
     }
 
     @Test
@@ -99,9 +112,9 @@ public class AbstractTypeHandlerTest extends DBTest {
 
 
     @BeforeEach
-    public void createConnAndPS() throws SQLException, ClassNotFoundException {
-        conn = createConnection();
-        ps = conn.prepareStatement("select * from author where id = ?");
+    public void createConnAndPS() {
+        ps = new TestPrepareStatement();
+        params = ps.getParams();
     }
 
     @BeforeAll
@@ -112,7 +125,7 @@ public class AbstractTypeHandlerTest extends DBTest {
 
     private class IntHandler extends AbstractTypeHandler {
         @Override
-        public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
+        public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
             try {
                 Object val = valueHolder.getVal();
                 if (val instanceof Byte) {
@@ -129,20 +142,20 @@ public class AbstractTypeHandlerTest extends DBTest {
                     ps.setInt(index, Integer.parseInt(val.toString()));
                 }
             } catch (Exception e) {
-                throw new SQLExecuteException("error", e);
+                throw new TypeHandleException("error", e);
             }
         }
 
         @Override
-        public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLExecuteException {
+        public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
             try {
                 if (StringUtils.isNotBlank(valueHolder.getDefaultExp())) {
                     Integer val = Integer.valueOf(valueHolder.getDefaultExp());
                     ps.setInt(index, val);
                 } else
-                    throw new SQLExecuteException(String.format("%s can't be null", valueHolder.getParamName()));
+                    throw new TypeHandleException(String.format("%s can't be null", valueHolder.getParamName()));
             } catch (SQLException e) {
-                throw new SQLExecuteException("error", e);
+                throw new TypeHandleException("error", e);
             }
 
         }

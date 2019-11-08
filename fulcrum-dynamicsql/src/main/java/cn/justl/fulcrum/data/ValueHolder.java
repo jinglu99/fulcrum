@@ -3,9 +3,11 @@ package cn.justl.fulcrum.data;
 /**
  * @Date : 2019-10-29
  * @Author : jinglu.wang[jingl.wang123@gmail.com]
- * @Desc :
+ * @Desc : A container to hold the parameters required to resolve sql parameters in {@link
+ * cn.justl.fulcrum.jdbc.typehandler.TypeHandler}
  */
 public class ValueHolder {
+
     private final String paramName;
     private final Object val;
     private final String type;
@@ -17,7 +19,6 @@ public class ValueHolder {
         this.type = type;
         this.defaultExp = defaultExp;
     }
-
 
     public String getParamName() {
         return paramName;
@@ -38,10 +39,10 @@ public class ValueHolder {
     @Override
     public String toString() {
         return "ValueHolder{" +
-                "paramName='" + paramName + '\'' +
-                ", val=" + val +
-                ", type='" + type + '\'' +
-                ", defaultExp='" + defaultExp + '\'' +
-                '}';
+            "paramName='" + paramName + '\'' +
+            ", val=" + val +
+            ", type='" + type + '\'' +
+            ", defaultExp='" + defaultExp + '\'' +
+            '}';
     }
 }
