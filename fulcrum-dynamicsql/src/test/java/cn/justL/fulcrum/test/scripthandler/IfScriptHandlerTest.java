@@ -2,7 +2,7 @@ package cn.justL.fulcrum.test.scripthandler;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
 import org.junit.jupiter.api.*;
@@ -30,7 +30,7 @@ public class IfScriptHandlerTest {
         aIsNull.setParams(new HashMap() {{
             put("a", null);
         }});
-        ScriptResult rs = handler.process(aIsNull);
+        BoundSql rs = handler.process(aIsNull);
         assertEquals("a=null", rs.getSql().toString());
         assertEquals(0, rs.getValueHolders().size());
 

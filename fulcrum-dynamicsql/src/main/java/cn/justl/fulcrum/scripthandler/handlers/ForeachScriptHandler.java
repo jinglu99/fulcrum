@@ -2,7 +2,7 @@ package cn.justl.fulcrum.scripthandler.handlers;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
     }
 
     @Override
-    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
+    public BoundSql process(ScriptContext context) throws ScriptFailedException {
         Object collection = validate(context);
          if (collection instanceof Map) {
             return processMap(context, (Map) collection);
@@ -41,25 +41,25 @@ public final class ForeachScriptHandler extends AbstractScriptHandler {
         }
     }
 
-    private ScriptResult processMap(ScriptContext context, Map target) throws ScriptFailedException {
+    private BoundSql processMap(ScriptContext context, Map target) throws ScriptFailedException {
         return doProcess(context, target.entrySet().toArray());
     }
 
-    private ScriptResult processCollection(ScriptContext context, Collection target) throws ScriptFailedException {
+    private BoundSql processCollection(ScriptContext context, Collection target) throws ScriptFailedException {
         return doProcess(context, target.toArray());
     }
 
-    private ScriptResult doProcess(ScriptContext context, Object[] items) throws ScriptFailedException {
-        ScriptResult sr = new ScriptResult();
+    private BoundSql doProcess(ScriptContext context, Object[] items) throws ScriptFailedException {
+        BoundSql sr = new BoundSql();
         sr.setSql(new StringBuilder());
         boolean needSeparator = false;
         for (int i = 0; i < items.length; i++) {
             if (null == items[i]) continue;
             try {
                 prepareParam(context, items[i], i);
-                ScriptResult subRs = getChild().process(context);
+                BoundSql subRs = getChild().process(context);
 
-                if (subRs == null || subRs instanceof ScriptResult.EmptyScriptResult || StringUtils.isBlank(subRs.getSql())) continue;
+                if (subRs == null || subRs instanceof BoundSql.EmptyBoundSql || StringUtils.isBlank(subRs.getSql())) continue;
 
                 if (needSeparator && StringUtils.isNotEmpty(separator))
                     sr.getSql().append(separator);

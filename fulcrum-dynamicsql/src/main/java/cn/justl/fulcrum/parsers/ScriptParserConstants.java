@@ -6,8 +6,7 @@ package cn.justl.fulcrum.parsers;
  * @Desc :
  */
 public class ScriptParserConstants {
-    public static final String DEFAULT_INDEX_NAME = "##_INDEX";
-    public static final String DEFAULT_SEPARATOR = "";
+
 
     private ScriptParserConstants() {}
 }

@@ -11,9 +11,9 @@ import java.util.Arrays;
  */
 public enum XmlElements {
 
-    SQL("sql"),
-    IF("if"),
-    FOR("for");
+    SQL(XMLParserConstants.SQL_ELEMENT),
+    IF(XMLParserConstants.IF_ELEMENT),
+    FOR(XMLParserConstants.FOR_ELEMENT);
     private String name;
 
     XmlElements(String name) {

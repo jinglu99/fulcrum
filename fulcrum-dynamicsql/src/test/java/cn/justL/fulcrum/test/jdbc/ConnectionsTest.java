@@ -1,10 +1,10 @@
 package cn.justL.fulcrum.test.jdbc;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.jdbc.Connections;
 import cn.justl.fulcrum.jdbc.FulcrumStatement;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +38,9 @@ public class ConnectionsTest extends DBTest {
 
 
     @Test
-    public void prepareStatementTest() throws SQLException, SQLExecuteException {
+    public void prepareStatementTest() throws SQLException, StatementExecuteException {
 
-        ScriptResult sr = new ScriptResult() {{
+        BoundSql sr = new BoundSql() {{
             setSql(new StringBuilder("select * from author"));
         }};
         FulcrumStatement fulcrumStatement = Connections.prepareStatement(conn, sr);
@@ -52,11 +52,11 @@ public class ConnectionsTest extends DBTest {
     @Test
     public void prepareStatementWhenConnIsCloseTest() throws SQLException {
         conn.close();
-        ScriptResult sr = new ScriptResult() {{
+        BoundSql sr = new BoundSql() {{
             setSql(new StringBuilder("select * from author"));
         }};
 
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(StatementExecuteException.class, () -> {
             Connections.prepareStatement(conn, sr);
         });
     }

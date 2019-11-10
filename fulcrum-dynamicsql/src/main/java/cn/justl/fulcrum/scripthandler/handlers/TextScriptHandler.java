@@ -3,7 +3,7 @@ package cn.justl.fulcrum.scripthandler.handlers;
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import cn.justl.fulcrum.scripthandler.ValueELResolver;
 
 /**
@@ -20,17 +20,17 @@ public final class TextScriptHandler extends AbstractScriptHandler {
     }
 
     @Override
-    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
+    public BoundSql process(ScriptContext context) throws ScriptFailedException {
         return resolveText(context);
     }
 
-    private ScriptResult resolveText(ScriptContext context) throws ScriptFailedException {
-        ScriptResult sr = new ScriptResult(new StringBuilder(text));
+    private BoundSql resolveText(ScriptContext context) throws ScriptFailedException {
+        BoundSql sr = new BoundSql(new StringBuilder(text));
         resolveText(sr, context);
         return sr;
     }
 
-    private static void resolveText(ScriptResult sr, ScriptContext context)
+    private static void resolveText(BoundSql sr, ScriptContext context)
             throws ScriptFailedException {
         int start, end;
         String exp = null;

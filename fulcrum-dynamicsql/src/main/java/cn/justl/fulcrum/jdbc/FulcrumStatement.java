@@ -1,10 +1,10 @@
 package cn.justl.fulcrum.jdbc;
 
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandlerResolver;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,42 +27,41 @@ public class FulcrumStatement {
     private final String sql;
     private final List<ValueHolder> values;
 
-    public FulcrumStatement(Connection conn, ScriptResult sr) throws SQLExecuteException {
+    public FulcrumStatement(Connection conn, BoundSql sr) throws StatementExecuteException {
         try {
             this.conn = conn;
             sql = sr.getSql().toString();
             values = sr.getValueHolders();
             preparedStatement = conn.prepareStatement(sr.getSql().toString());
         } catch (Exception e) {
-            logger.error("Fail to prepare statement", e);
-            throw new SQLExecuteException("fail to prepare statement", e);
+            throw new StatementExecuteException("fail to prepare statement", e);
         }
 }
 
-    public ResultSet execute() throws SQLExecuteException {
+    public ResultSet execute() throws StatementExecuteException {
         setParams();
 
         return doExecute();
     }
 
-    private ResultSet doExecute() throws SQLExecuteException {
+    private ResultSet doExecute() throws StatementExecuteException {
         try {
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            throw new SQLExecuteException("fail to execute prepareStatement!", e);
+            throw new StatementExecuteException("fail to execute prepareStatement!", e);
         }
     }
 
     /**
      * set params for prepareStatement
      */
-    private void setParams() throws SQLExecuteException {
+    private void setParams() throws StatementExecuteException {
         for (int i = 0; i < values.size(); i++) {
             try {
                 TypeHandlerResolver.resolveTypeHandler(values.get(i))
                         .setParam(preparedStatement, i + 1, values.get(i));
             } catch (TypeHandleException e) {
-                throw new SQLExecuteException("failed to handle the parameter of executing sql!", e);
+                throw new StatementExecuteException("failed to handle the parameter of executing sql!", e);
             }
         }
     }

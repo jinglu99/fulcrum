@@ -15,6 +15,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -47,6 +50,7 @@ public class XMLSqlParser {
             //Create XPath
             XPathFactory xpathfactory = XPathFactory.newInstance();
             xPath = xpathfactory.newXPath();
+//            xPath.setNamespaceContext();
         } catch (ParserConfigurationException e) {
             throw new XmlParseException("xml parsing failed!", e);
         } catch (IOException e) {
@@ -58,11 +62,17 @@ public class XMLSqlParser {
 
     public ScriptHandler parse() throws XmlParseException {
         try {
-            Node sqlNode = (Node) xPath.evaluate("//Sql", doc, XPathConstants.NODE);
-            scriptHandler = parse(sqlNode);
+            Node sqlNode = (Node) xPath.evaluate("/*", doc, XPathConstants.NODE);
+
+            if (sqlNode == null
+                    || !StringUtils.equals(XMLParserConstants.NAMESPACE_URL, sqlNode.getNamespaceURI())
+                    || !StringUtils.equals(XMLParserConstants.SQL_ELEMENT, sqlNode.getNodeName()))
+                throw new XmlParseException("It's not a <SQL> root xml doc!");
+            else
+                scriptHandler = parse(sqlNode);
             return scriptHandler;
         } catch (XPathExpressionException e) {
-            throw new XmlParseException("Element <Sql> not found", e);
+            throw new XmlParseException("fail to parse Element <SQL>", e);
         }
     }
 
@@ -105,9 +115,9 @@ public class XMLSqlParser {
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node item = nodeList.item(i);
-            if (item.getNodeName().toLowerCase().equals("case")) {
-                ifScriptHandler.addCase(item.getAttributes().getNamedItem("cond").getTextContent(), parse(item));
-            } else if (item.getNodeName().toLowerCase().equals("else")) {
+            if (item.getNodeName().toLowerCase().equals(XMLParserConstants.IF_CASE_ELEMENT)) {
+                ifScriptHandler.addCase(item.getAttributes().getNamedItem(XMLParserConstants.IF_CASE_COND_ATTR).getTextContent(), parse(item));
+            } else if (item.getNodeName().toLowerCase().equals(XMLParserConstants.IF_ELSE_ELEMENT)) {
                 ifScriptHandler.addElse(parse(item));
             }
         }
@@ -117,15 +127,15 @@ public class XMLSqlParser {
     private ScriptHandler parseForeachElementIfMatched(Node node) throws XmlParseException {
         if (!XmlElements.FOR.isMatch(node)) return null;
 
-        Node collection = node.getAttributes().getNamedItem("collection");
-        Node item = node.getAttributes().getNamedItem("item");
-        Node index = node.getAttributes().getNamedItem("index");
-        Node separator = node.getAttributes().getNamedItem("separator");
+        Node collection = node.getAttributes().getNamedItem(XMLParserConstants.FOR_COLLECTION_ATTR);
+        Node item = node.getAttributes().getNamedItem(XMLParserConstants.FOR_ITEM_ATTR);
+        Node index = node.getAttributes().getNamedItem(XMLParserConstants.FOR_INDEX_ATTR);
+        Node separator = node.getAttributes().getNamedItem(XMLParserConstants.FOR_SEPARATOR_ATTR);
 
         String collectionName = collection.getTextContent();
         String itemName = item.getTextContent();
-        String indexName = index == null ? "##_INDEX" : index.getTextContent();
-        String separator1 = separator == null ? "" : separator.getTextContent();
+        String indexName = index == null ? XMLParserConstants.DEFAULT_INDEX_NAME : index.getTextContent();
+        String separator1 = separator == null ? XMLParserConstants.DEFAULT_SEPARATOR : separator.getTextContent();
 
         ForeachScriptHandler scriptHandler = new ForeachScriptHandler(collectionName, itemName, indexName, separator1);
         scriptHandler.setChild(parse(node));

@@ -3,7 +3,7 @@ package cn.justl.fulcrum.scripthandler.handlers;
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.scripthandler.ScriptHandler;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 
@@ -19,13 +19,13 @@ public final class IfScriptHandler extends AbstractScriptHandler {
     private final List<Case> cazes = new ArrayList();
 
     @Override
-    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
+    public BoundSql process(ScriptContext context) throws ScriptFailedException {
         for (Case caze : cazes) {
             if (caze.isMatch(context)) {
                 return caze.process(context);
             }
         }
-        return ScriptResult.emptyResult();
+        return BoundSql.emptyResult();
     }
 
     public IfScriptHandler addCase(String cond, ScriptHandler scriptHandler) {
@@ -76,7 +76,7 @@ public final class IfScriptHandler extends AbstractScriptHandler {
         }
 
         @Override
-        public ScriptResult process(ScriptContext context) throws ScriptFailedException {
+        public BoundSql process(ScriptContext context) throws ScriptFailedException {
             if (getChild() == null) {
                 throw new ScriptFailedException("No child ScriptHandler exist in execution tree!");
             }

@@ -17,7 +17,7 @@ import cn.justl.fulcrum.scripthandler.handlers.*;
  * @see ListableScriptHandler
  */
 public interface ScriptHandler {
-    ScriptResult process(ScriptContext context) throws ScriptFailedException;
+    BoundSql process(ScriptContext context) throws ScriptFailedException;
 
     ScriptHandler getParent();
 

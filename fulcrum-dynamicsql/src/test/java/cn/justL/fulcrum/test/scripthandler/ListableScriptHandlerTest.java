@@ -3,7 +3,7 @@ package cn.justL.fulcrum.test.scripthandler;
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.scripthandler.ScriptHandler;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.ListableScriptHandler;
@@ -35,7 +35,7 @@ public class ListableScriptHandlerTest {
             put("col", Arrays.asList(1,2));
         }});
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
         assertEquals("text:? if:a=other ? ? ", sr.getSql().toString());
         assertEquals(3, sr.getValueHolders().size());
     }

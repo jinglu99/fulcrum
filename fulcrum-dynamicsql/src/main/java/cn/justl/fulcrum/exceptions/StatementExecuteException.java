@@ -5,13 +5,13 @@ package cn.justl.fulcrum.exceptions;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class SQLExecuteException extends Exception {
+public class StatementExecuteException extends Exception {
 
-    public SQLExecuteException(String message) {
+    public StatementExecuteException(String message) {
         super(message);
     }
 
-    public SQLExecuteException(String message, Throwable cause) {
+    public StatementExecuteException(String message, Throwable cause) {
         super(message, cause);
     }
 }

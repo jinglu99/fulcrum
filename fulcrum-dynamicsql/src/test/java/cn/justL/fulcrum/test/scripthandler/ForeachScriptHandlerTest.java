@@ -2,7 +2,7 @@ package cn.justL.fulcrum.test.scripthandler;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
 import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ public class ForeachScriptHandlerTest {
         ForeachScriptHandler handler = new ForeachScriptHandler("collection", "item", "index", ",");
         handler.setChild(new TextScriptHandler("{$index}:{$item}"));
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals(10, sr.getValueHolders().size());
         assertEquals("?:?,?:?,?:?,?:?,?:?", sr.getSql().toString());
@@ -78,7 +78,7 @@ public class ForeachScriptHandlerTest {
         ForeachScriptHandler handler = new ForeachScriptHandler("collection", "item", "index", ",");
         handler.setChild(new TextScriptHandler("{$index}:{$item.a}"));
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals(4, sr.getValueHolders().size());
         assertEquals("?:?,?:?", sr.getSql().toString());
@@ -106,7 +106,7 @@ public class ForeachScriptHandlerTest {
         ForeachScriptHandler handler = new ForeachScriptHandler("collection", "item", "index", ",");
         handler.setChild(new TextScriptHandler("{$index}:{$item[0]}"));
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals(4, sr.getValueHolders().size());
         assertEquals("?:?,?:?", sr.getSql().toString());
@@ -134,7 +134,7 @@ public class ForeachScriptHandlerTest {
         ForeachScriptHandler handler = new ForeachScriptHandler("collection", "item", "index", ",");
         handler.setChild(new TextScriptHandler("{$index}:{$item[0]}"));
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals(4, sr.getValueHolders().size());
         assertEquals("?:?,?:?", sr.getSql().toString());
@@ -163,7 +163,7 @@ public class ForeachScriptHandlerTest {
         handler.setChild(new TextScriptHandler("{$index}:{$item.key}:{$item.value}"));
 
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals("?:?:?,?:?:?", sr.getSql().toString());
         assertEquals(6, sr.getValueHolders().size());
@@ -188,7 +188,7 @@ public class ForeachScriptHandlerTest {
             }});
         }};
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals("? ? ?", sr.getSql().toString());
         assertEquals(3, sr.getValueHolders().size());
@@ -205,7 +205,7 @@ public class ForeachScriptHandlerTest {
             }});
         }};
 
-        ScriptResult sr = handler.process(context);
+        BoundSql sr = handler.process(context);
 
         assertEquals("? ?", sr.getSql().toString());
         assertEquals(2, sr.getValueHolders().size());

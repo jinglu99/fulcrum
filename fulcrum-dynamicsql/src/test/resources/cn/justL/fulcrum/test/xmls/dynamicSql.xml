@@ -1,19 +1,18 @@
 <SQL xmlns="http://jingl.wang/fulcrum-dynamic-sql.xsd">
-    select * from table
+    select
+    itemid, productid, listprice, unitcost, supplier, status, attr2
+    from table
     where 1 = 1
     <if>
-        <case cond="a != nil">
-            and a = {$a}
+        <case cond="itemId != nil">
+            and itemid = {$itemId}
         </case>
-        <else>
-            and a is null
-        </else>
     </if>
     <if>
-        <case cond="items != nil">
+        <case cond="itemIds != nil">
             and ( 1 = 2
             <for collection="items" item="item">
-                or item = {$item}
+                or itemid = {$item}
             </for>
             )
         </case>

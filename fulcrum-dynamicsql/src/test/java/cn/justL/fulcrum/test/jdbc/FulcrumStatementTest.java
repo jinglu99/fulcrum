@@ -2,19 +2,15 @@ package cn.justL.fulcrum.test.jdbc;
 
 import cn.justL.fulcrum.test.databases.DBTest;
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
+import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.jdbc.FulcrumStatement;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.Reader;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -29,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FulcrumStatementTest extends DBTest {
 
     private Connection conn;
-    private ScriptResult sr;
+    private BoundSql sr;
 
     @BeforeAll
     public static void setup() throws SQLException, ClassNotFoundException, IOException {
@@ -40,7 +36,7 @@ public class FulcrumStatementTest extends DBTest {
     public void connect() throws SQLException, ClassNotFoundException {
         conn = createConnection();
 
-        sr = new ScriptResult() {{
+        sr = new BoundSql() {{
             setSql(new StringBuilder("select * from author where id = ?"));
         }};
 
@@ -48,7 +44,7 @@ public class FulcrumStatementTest extends DBTest {
     }
 
     @Test
-    public void simpleTest() throws SQLExecuteException, SQLException {
+    public void simpleTest() throws StatementExecuteException, SQLException {
         FulcrumStatement statement = new FulcrumStatement(conn, sr);
         ResultSet rs = statement.execute();
         assertNotNull(rs);
@@ -61,18 +57,18 @@ public class FulcrumStatementTest extends DBTest {
     }
 
     @Test
-    public void simpleTestWhenConnIsClosed() throws SQLException, SQLExecuteException {
+    public void simpleTestWhenConnIsClosed() throws SQLException, StatementExecuteException {
         conn.close();
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(StatementExecuteException.class, () -> {
             FulcrumStatement statement = new FulcrumStatement(conn, sr);
         });
     }
 
     @Test
-    public void connectionClosedBeforeExecute() throws SQLExecuteException, SQLException {
+    public void connectionClosedBeforeExecute() throws StatementExecuteException, SQLException {
         FulcrumStatement statement = new FulcrumStatement(conn, sr);
         conn.close();
-        assertThrows(SQLExecuteException.class, () -> {
+        assertThrows(StatementExecuteException.class, () -> {
             statement.execute();
         });
     }

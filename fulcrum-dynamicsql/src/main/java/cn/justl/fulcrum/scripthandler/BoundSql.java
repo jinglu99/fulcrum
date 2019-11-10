@@ -10,20 +10,20 @@ import java.util.List;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class ScriptResult {
+public class BoundSql {
     private StringBuilder sql;
     private final List<ValueHolder> valueHolders = new ArrayList<>();
 
 
-    private final static ScriptResult EMPTY_RESULT = new EmptyScriptResult();
-    public static ScriptResult emptyResult() {
+    private final static BoundSql EMPTY_RESULT = new EmptyBoundSql();
+    public static BoundSql emptyResult() {
         return EMPTY_RESULT;
     }
 
-    public ScriptResult() {
+    public BoundSql() {
     }
 
-    public ScriptResult(StringBuilder sql) {
+    public BoundSql(StringBuilder sql) {
         this.sql = sql;
     }
 
@@ -55,8 +55,8 @@ public class ScriptResult {
                 '}';
     }
 
-    public static final class EmptyScriptResult extends ScriptResult {
-        protected EmptyScriptResult() {}
+    public static final class EmptyBoundSql extends BoundSql {
+        protected EmptyBoundSql() {}
 
         @Override
         public StringBuilder getSql() {

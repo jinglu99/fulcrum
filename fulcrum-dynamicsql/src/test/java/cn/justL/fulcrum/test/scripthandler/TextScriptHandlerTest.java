@@ -3,7 +3,7 @@ package cn.justL.fulcrum.test.scripthandler;
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
 import org.junit.jupiter.api.*;
 
@@ -25,7 +25,7 @@ public class TextScriptHandlerTest {
 
         ScriptContext context = new ScriptContext();
 
-        ScriptResult rs = handler.process(context);
+        BoundSql rs = handler.process(context);
 
         assertEquals("hello world!", rs.getSql().toString());
         assertEquals(0, rs.getValueHolders().size());
@@ -42,7 +42,7 @@ public class TextScriptHandlerTest {
             put("name2", "Bob");
         }});
 
-        ScriptResult rs =  handler.process(context);
+        BoundSql rs =  handler.process(context);
 
         assertEquals("hello ? and ?!", rs.getSql().toString());
         assertEquals(2, rs.getValueHolders().size());

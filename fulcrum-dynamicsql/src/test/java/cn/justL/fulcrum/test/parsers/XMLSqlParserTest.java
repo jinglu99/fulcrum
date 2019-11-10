@@ -3,6 +3,7 @@ package cn.justL.fulcrum.test.parsers;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.exceptions.XmlParseException;
 import cn.justl.fulcrum.parsers.ScriptParserConstants;
+import cn.justl.fulcrum.parsers.XMLParserConstants;
 import cn.justl.fulcrum.parsers.XMLSqlParser;
 import cn.justl.fulcrum.scripthandler.ScriptHandler;
 
@@ -75,8 +76,8 @@ public class XMLSqlParserTest {
         ForeachScriptHandler foreachScriptHandler = (ForeachScriptHandler) caseHandler.getScripts().get(1);
         assertEquals("items", foreachScriptHandler.getCollectionName());
         assertEquals("item", foreachScriptHandler.getItemName());
-        assertEquals(ScriptParserConstants.DEFAULT_INDEX_NAME, foreachScriptHandler.getIndexName());
-        assertEquals(ScriptParserConstants.DEFAULT_SEPARATOR, foreachScriptHandler.getSeparator());
+        assertEquals(XMLParserConstants.DEFAULT_INDEX_NAME, foreachScriptHandler.getIndexName());
+        assertEquals(XMLParserConstants.DEFAULT_SEPARATOR, foreachScriptHandler.getSeparator());
         assertTrue(foreachScriptHandler.getChild() instanceof ListableScriptHandler);
 
         ListableScriptHandler foreachListableHandler = (ListableScriptHandler) foreachScriptHandler.getChild();

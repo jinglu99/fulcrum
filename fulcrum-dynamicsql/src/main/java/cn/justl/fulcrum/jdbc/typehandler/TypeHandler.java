@@ -1,12 +1,10 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
 import cn.justl.fulcrum.data.ValueHolder;
-import cn.justl.fulcrum.exceptions.SQLExecuteException;
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.exceptions.StatementExecuteException;
 
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 /**
  * @Date : 2019/10/25
@@ -24,7 +22,7 @@ public interface TypeHandler {
      * @param ps
      * @param index
      * @param valueHolder
-     * @throws SQLExecuteException
+     * @throws StatementExecuteException
      */
     void setParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException;
 

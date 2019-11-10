@@ -3,7 +3,7 @@ package cn.justl.fulcrum.scripthandler.handlers;
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.scripthandler.ScriptHandler;
-import cn.justl.fulcrum.scripthandler.ScriptResult;
+import cn.justl.fulcrum.scripthandler.BoundSql;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +19,12 @@ public class ListableScriptHandler extends AbstractScriptHandler {
     private final List<ScriptHandler> scriptList = new ArrayList<>();
 
     @Override
-    public ScriptResult process(ScriptContext context) throws ScriptFailedException {
-        ScriptResult sr = new ScriptResult();
+    public BoundSql process(ScriptContext context) throws ScriptFailedException {
+        BoundSql sr = new BoundSql();
         sr.setSql(new StringBuilder());
         for (ScriptHandler scriptHandler : scriptList) {
-            ScriptResult subRs = scriptHandler.process(context);
-            if (subRs == null && subRs instanceof ScriptResult.EmptyScriptResult) continue;
+            BoundSql subRs = scriptHandler.process(context);
+            if (subRs == null && subRs instanceof BoundSql.EmptyBoundSql) continue;
             sr.getSql().append(subRs.getSql()).append(" ");
             sr.addAllValue(subRs.getValueHolders());
         }
