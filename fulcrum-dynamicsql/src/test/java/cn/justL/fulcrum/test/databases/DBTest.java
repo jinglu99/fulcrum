@@ -1,8 +1,5 @@
 package cn.justL.fulcrum.test.databases;
 
-import cn.justL.fulcrum.test.jdbc.ScriptRunner;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -11,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @Date : 2019-11-04

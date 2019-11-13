@@ -1,18 +1,17 @@
-package cn.justL.fulcrum.test.parsers;
+package cn.justL.fulcrum.test.parser;
 
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.exceptions.XmlParseException;
-import cn.justl.fulcrum.parsers.ScriptParserConstants;
-import cn.justl.fulcrum.parsers.XMLParserConstants;
-import cn.justl.fulcrum.parsers.XMLSqlParser;
-import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.exceptions.DynamicSQLParseException;
+import cn.justl.fulcrum.parser.XMLParserConstants;
+import cn.justl.fulcrum.parser.XMLSqlParser;
+import cn.justl.fulcrum.script.ScriptHandler;
 
 import java.io.IOException;
 
-import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.ListableScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
+import cn.justl.fulcrum.script.handlers.ForeachScriptHandler;
+import cn.justl.fulcrum.script.handlers.IfScriptHandler;
+import cn.justl.fulcrum.script.handlers.ListableScriptHandler;
+import cn.justl.fulcrum.script.handlers.TextScriptHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("XMLSqlParser Test")
 public class XMLSqlParserTest {
 
-    private final static String simpleSqlPath = "/cn/justL/fulcrum/test/parses/xmls/simpleSql.xml";
-    private final static String dynamicSqlPath = "/cn/justL/fulcrum/test/parses/xmls/dynamicSql.xml";
-    private final static String unknownTagExistSqlPath = "/cn/justL/fulcrum/test/parses/xmls/unknowTagExistSql.xml";
-    private final static String wrongStructXmlPath = "/cn/justL/fulcrum/test/parses/xmls/wrongStrutXml.xml";
+    private final static String simpleSqlPath = "/cn/justL/fulcrum/test/xmls/parsers/simpleSql.xml";
+    private final static String dynamicSqlPath = "/cn/justL/fulcrum/test/xmls/parsers/dynamicSql.xml";
+    private final static String unknownTagExistSqlPath = "/cn/justL/fulcrum/test/xmls/parsers/unknowTagExistSql.xml";
+    private final static String wrongStructXmlPath = "/cn/justL/fulcrum/test/xmls/parsers/wrongStrutXml.xml";
 
 
     @Test
-    public void simpleSqlTest() throws IOException , ScriptFailedException, XmlParseException {
+    public void simpleSqlTest() throws IOException , ScriptFailedException, DynamicSQLParseException {
         XMLSqlParser parser = new XMLSqlParser(XMLSqlParserTest.class.getResourceAsStream(simpleSqlPath));
         ScriptHandler handler = parser.parse();
 
@@ -46,7 +45,7 @@ public class XMLSqlParserTest {
 
 
     @Test
-    public void dynamicSqlTest() throws XmlParseException {
+    public void dynamicSqlTest() throws DynamicSQLParseException {
         XMLSqlParser parser = new XMLSqlParser(XMLSqlParserTest.class.getResourceAsStream(dynamicSqlPath));
         ListableScriptHandler handler = (ListableScriptHandler) parser.parse();
 
@@ -86,15 +85,15 @@ public class XMLSqlParserTest {
     }
 
     @Test
-    public void unknownTagExistsTest() throws XmlParseException {
+    public void unknownTagExistsTest() throws DynamicSQLParseException {
         XMLSqlParser parser = new XMLSqlParser(XMLSqlParserTest.class.getResourceAsStream(unknownTagExistSqlPath));
-        assertThrows(XmlParseException.class, ()->{parser.parse();});
+        assertThrows(DynamicSQLParseException.class, ()->{parser.parse();});
     }
 
 
     @Test
-    public void wrongStructureXmlTest() throws XmlParseException{
-        assertThrows(XmlParseException.class, ()->{
+    public void wrongStructureXmlTest() throws DynamicSQLParseException {
+        assertThrows(DynamicSQLParseException.class, ()->{
             XMLSqlParser parser = new XMLSqlParser(XMLSqlParserTest.class.getResourceAsStream(wrongStructXmlPath));
             parser.parse();
         });

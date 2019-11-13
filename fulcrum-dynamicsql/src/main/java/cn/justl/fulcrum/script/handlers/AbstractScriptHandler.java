@@ -1,6 +1,6 @@
-package cn.justl.fulcrum.scripthandler.handlers;
+package cn.justl.fulcrum.script.handlers;
 
-import cn.justl.fulcrum.scripthandler.ScriptHandler;
+import cn.justl.fulcrum.script.ScriptHandler;
 
 /**
  * @Date : 2019/9/27

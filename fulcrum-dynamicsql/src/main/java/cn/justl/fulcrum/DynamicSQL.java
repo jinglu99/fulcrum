@@ -8,7 +8,7 @@ import java.io.InputStream;
  * @Desc :
  * A container to hold dynamic sql input stream which used in the constructor of {@link DynamicSQLExecutor}
  */
-public class DynamicSql {
+public class DynamicSQL {
     private InputStream sql;
 
     public InputStream getSql() {

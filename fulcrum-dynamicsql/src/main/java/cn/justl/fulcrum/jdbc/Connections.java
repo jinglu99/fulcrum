@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.jdbc;
 
 import cn.justl.fulcrum.exceptions.StatementExecuteException;
-import cn.justl.fulcrum.scripthandler.BoundSql;
+import cn.justl.fulcrum.script.BoundSql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

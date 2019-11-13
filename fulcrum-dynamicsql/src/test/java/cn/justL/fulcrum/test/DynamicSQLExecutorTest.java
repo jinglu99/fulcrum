@@ -4,10 +4,9 @@ import cn.justL.fulcrum.test.databases.DBTest;
 import cn.justl.fulcrum.DynamicSQLExecutor;
 import cn.justl.fulcrum.DynamicSQLParams;
 import cn.justl.fulcrum.DynamicSQLResult;
-import cn.justl.fulcrum.DynamicSql;
+import cn.justl.fulcrum.DynamicSQL;
 import cn.justl.fulcrum.exceptions.DynamicSqlConstructionException;
 import cn.justl.fulcrum.exceptions.DynamicSqlExecutionException;
-import org.apache.commons.collections.MapUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +49,7 @@ public class DynamicSQLExecutorTest extends DBTest {
 
     @Test
     public void dynamicSqlExecutorSimpleTest() throws DynamicSqlConstructionException, DynamicSqlExecutionException {
-        DynamicSql dynamicSql = new DynamicSql();
+        DynamicSQL dynamicSql = new DynamicSQL();
         dynamicSql.setSql(DynamicSQLExecutorTest.class.getResourceAsStream(dynamicSqlPath));
 
         DynamicSQLExecutor executor = new DynamicSQLExecutor(dynamicSql);
@@ -85,11 +84,11 @@ public class DynamicSQLExecutorTest extends DBTest {
         //      and itemid = 'EST-1'
 
         DynamicSQLParams params2 = new DynamicSQLParams();
-        params1.setParams(new HashMap() {{
+        params2.setParams(new HashMap() {{
             put("itemIds", Arrays.asList("EST-1","EST-2"));
         }});
-        params1.setConnection(conn);
-        DynamicSQLResult rs2 = executor.execute(params1);
+        params2.setConnection(conn);
+        DynamicSQLResult rs2 = executor.execute(params2);
 
 
         // select
@@ -97,9 +96,9 @@ public class DynamicSQLExecutorTest extends DBTest {
         //    from table
         //    where 1 = 1
         //      and (1 = 2 or itemid = 'EST-1' or itemid = 'EST-2')
-        assertNotNull(rs1);
-        assertEquals(2, rs1.getResult().size());
-        Map firstRowData1 = rs1.getResult().get(0);
+        assertNotNull(rs2);
+        assertEquals(2, rs2.getResult().size());
+        Map firstRowData1 = rs2.getResult().get(0);
         assertNotNull(firstRowData1);
         assertFalse(firstRowData1.containsKey("attr1"));
         assertTrue(firstRowData1.containsKey("attr2"));
@@ -109,11 +108,20 @@ public class DynamicSQLExecutorTest extends DBTest {
 
 
     @Test
-    public void staticSqlTest() throws SQLException, ClassNotFoundException {
+    public void staticSqlTest() throws SQLException, ClassNotFoundException, DynamicSqlConstructionException, DynamicSqlExecutionException {
         String targetSql = "select * from author where id = 101";
         List goalResult = executeSql(targetSql);
 
+        DynamicSQL dynamicSql = new DynamicSQL();
+        dynamicSql.setSql(DynamicSQLExecutorTest.class.getResourceAsStream(staticSqlPath));
+        DynamicSQLExecutor executor = new DynamicSQLExecutor(dynamicSql);
 
+
+        DynamicSQLParams params = new DynamicSQLParams();
+        params.setConnection(createConnection());
+        DynamicSQLResult result = executor.execute(params);
+
+        assertTrue(compareResult(goalResult, result.getResult()));
 
     }
 

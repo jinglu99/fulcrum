@@ -1,9 +1,9 @@
-package cn.justl.fulcrum.scripthandler.handlers;
+package cn.justl.fulcrum.script.handlers;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.ScriptHandler;
-import cn.justl.fulcrum.scripthandler.BoundSql;
+import cn.justl.fulcrum.script.ScriptHandler;
+import cn.justl.fulcrum.script.BoundSql;
 
 import java.util.ArrayList;
 import java.util.List;

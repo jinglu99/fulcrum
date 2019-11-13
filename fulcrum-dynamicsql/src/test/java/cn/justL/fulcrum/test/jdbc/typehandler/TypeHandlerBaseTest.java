@@ -1,7 +1,7 @@
 package cn.justL.fulcrum.test.jdbc.typehandler;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justL.fulcrum.test.jdbc.JDBCTest;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;

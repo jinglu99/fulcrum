@@ -4,7 +4,7 @@ import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandlerResolver;
-import cn.justl.fulcrum.scripthandler.BoundSql;
+import cn.justl.fulcrum.script.BoundSql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,6 @@ public class FulcrumStatement {
 
     public ResultSet execute() throws StatementExecuteException {
         setParams();
-
         return doExecute();
     }
 

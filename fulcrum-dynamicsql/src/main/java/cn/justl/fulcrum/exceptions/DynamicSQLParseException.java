@@ -5,12 +5,12 @@ package cn.justl.fulcrum.exceptions;
  * @Author : jingl.wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class XmlParseException extends Exception {
-    public XmlParseException(String message) {
+public class DynamicSQLParseException extends Exception {
+    public DynamicSQLParseException(String message) {
         super(message);
     }
 
-    public XmlParseException(String message, Throwable cause) {
+    public DynamicSQLParseException(String message, Throwable cause) {
         super(message, cause);
     }
 }

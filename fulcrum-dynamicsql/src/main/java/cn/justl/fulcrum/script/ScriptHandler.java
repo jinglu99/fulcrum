@@ -1,8 +1,8 @@
-package cn.justl.fulcrum.scripthandler;
+package cn.justl.fulcrum.script;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.handlers.*;
+import cn.justl.fulcrum.script.handlers.*;
 
 /**
  * @Date : 2019/9/27

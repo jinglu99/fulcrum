@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.scripthandler;
+package cn.justl.fulcrum.script;
 
 import cn.justl.fulcrum.data.ValueHolder;
 

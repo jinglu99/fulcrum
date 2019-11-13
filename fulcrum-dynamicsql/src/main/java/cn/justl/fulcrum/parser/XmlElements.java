@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.parsers;
+package cn.justl.fulcrum.parser;
 
 import org.w3c.dom.Node;
 

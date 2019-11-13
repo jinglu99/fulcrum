@@ -1,11 +1,11 @@
-package cn.justl.fulcrum.parsers;
+package cn.justl.fulcrum.parser;
 
-import cn.justl.fulcrum.exceptions.XmlParseException;
-import cn.justl.fulcrum.scripthandler.*;
-import cn.justl.fulcrum.scripthandler.handlers.ForeachScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.IfScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.ListableScriptHandler;
-import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
+import cn.justl.fulcrum.exceptions.DynamicSQLParseException;
+import cn.justl.fulcrum.script.*;
+import cn.justl.fulcrum.script.handlers.ForeachScriptHandler;
+import cn.justl.fulcrum.script.handlers.IfScriptHandler;
+import cn.justl.fulcrum.script.handlers.ListableScriptHandler;
+import cn.justl.fulcrum.script.handlers.TextScriptHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -15,9 +15,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -39,7 +36,7 @@ public class XMLSqlParser {
 
     private ScriptHandler scriptHandler;
 
-    public XMLSqlParser(InputStream inputStream) throws XmlParseException {
+    public XMLSqlParser(InputStream inputStream) throws DynamicSQLParseException {
         try {
             //Build DOM
             factory = DocumentBuilderFactory.newInstance();
@@ -52,31 +49,31 @@ public class XMLSqlParser {
             xPath = xpathfactory.newXPath();
 //            xPath.setNamespaceContext();
         } catch (ParserConfigurationException e) {
-            throw new XmlParseException("xml parsing failed!", e);
+            throw new DynamicSQLParseException("xml parsing failed!", e);
         } catch (IOException e) {
-            throw new XmlParseException("xml parsing failed!", e);
+            throw new DynamicSQLParseException("xml parsing failed!", e);
         } catch (SAXException e) {
-            throw new XmlParseException("xml parsing failed!", e);
+            throw new DynamicSQLParseException("xml parsing failed!", e);
         }
     }
 
-    public ScriptHandler parse() throws XmlParseException {
+    public ScriptHandler parse() throws DynamicSQLParseException {
         try {
             Node sqlNode = (Node) xPath.evaluate("/*", doc, XPathConstants.NODE);
 
             if (sqlNode == null
                     || !StringUtils.equals(XMLParserConstants.NAMESPACE_URL, sqlNode.getNamespaceURI())
                     || !StringUtils.equals(XMLParserConstants.SQL_ELEMENT, sqlNode.getNodeName()))
-                throw new XmlParseException("It's not a <SQL> root xml doc!");
+                throw new DynamicSQLParseException("It's not a <SQL> root xml doc!");
             else
                 scriptHandler = parse(sqlNode);
             return scriptHandler;
         } catch (XPathExpressionException e) {
-            throw new XmlParseException("fail to parse Element <SQL>", e);
+            throw new DynamicSQLParseException("fail to parse Element <SQL>", e);
         }
     }
 
-    private ScriptHandler parse(Node node) throws XmlParseException {
+    private ScriptHandler parse(Node node) throws DynamicSQLParseException {
         NodeList nodeList = node.getChildNodes();
         ListableScriptHandler scriptHandler = new ListableScriptHandler();
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -90,25 +87,25 @@ public class XMLSqlParser {
         return scriptHandler;
     }
 
-    private ScriptHandler parseElement(Node node) throws XmlParseException {
+    private ScriptHandler parseElement(Node node) throws DynamicSQLParseException {
         if (XmlElements.isDefaultElement(node)) {
             return parseDefaultElement(node);
         } else {
-            throw new XmlParseException("Element: <" + node.getNodeName() + "> can not be parsed");
+            throw new DynamicSQLParseException("Element: <" + node.getNodeName() + "> can not be parsed");
         }
     }
 
-    private ScriptHandler parseDefaultElement(Node node) throws XmlParseException {
+    private ScriptHandler parseDefaultElement(Node node) throws DynamicSQLParseException {
 
         ScriptHandler handler = null;
         if ((handler = parseIfElementIfMatched(node)) != null) return handler;
 
         if ((handler = parseForeachElementIfMatched(node)) != null) return handler;
 
-        throw new XmlParseException("Element: <" + node.getNodeName() + "> can not be parsed");
+        throw new DynamicSQLParseException("Element: <" + node.getNodeName() + "> can not be parsed");
     }
 
-    private ScriptHandler parseIfElementIfMatched(Node node) throws XmlParseException {
+    private ScriptHandler parseIfElementIfMatched(Node node) throws DynamicSQLParseException {
         if (!XmlElements.IF.isMatch(node)) return null;
 
         IfScriptHandler ifScriptHandler = new IfScriptHandler();
@@ -124,7 +121,7 @@ public class XMLSqlParser {
         return ifScriptHandler;
     }
 
-    private ScriptHandler parseForeachElementIfMatched(Node node) throws XmlParseException {
+    private ScriptHandler parseForeachElementIfMatched(Node node) throws DynamicSQLParseException {
         if (!XmlElements.FOR.isMatch(node)) return null;
 
         Node collection = node.getAttributes().getNamedItem(XMLParserConstants.FOR_COLLECTION_ATTR);

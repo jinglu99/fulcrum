@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.parsers;
+package cn.justl.fulcrum.parser;
 
 /**
  * @Date : 2019-11-04

@@ -1,10 +1,10 @@
-package cn.justL.fulcrum.test.scripthandler;
+package cn.justL.fulcrum.test.script;
 
 import cn.justl.fulcrum.data.ScriptContext;
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.scripthandler.BoundSql;
-import cn.justl.fulcrum.scripthandler.handlers.TextScriptHandler;
+import cn.justl.fulcrum.script.BoundSql;
+import cn.justl.fulcrum.script.handlers.TextScriptHandler;
 import org.junit.jupiter.api.*;
 
 import java.util.HashMap;

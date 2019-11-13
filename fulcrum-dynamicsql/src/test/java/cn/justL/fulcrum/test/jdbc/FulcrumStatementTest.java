@@ -4,7 +4,7 @@ import cn.justL.fulcrum.test.databases.DBTest;
 import cn.justl.fulcrum.data.ValueHolder;
 import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.jdbc.FulcrumStatement;
-import cn.justl.fulcrum.scripthandler.BoundSql;
+import cn.justl.fulcrum.script.BoundSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

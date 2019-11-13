@@ -1,4 +1,4 @@
-package cn.justL.fulcrum.test.jdbc;
+package cn.justL.fulcrum.test.databases;
 
 import cn.justL.fulcrum.test.databases.DBTest;
 import java.io.IOException;
