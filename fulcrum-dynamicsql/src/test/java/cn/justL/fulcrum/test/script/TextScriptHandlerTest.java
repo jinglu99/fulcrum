@@ -1,7 +1,7 @@
 package cn.justL.fulcrum.test.script;
 
-import cn.justl.fulcrum.data.ScriptContext;
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.script.ScriptContext;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.script.BoundSql;
 import cn.justl.fulcrum.script.handlers.TextScriptHandler;

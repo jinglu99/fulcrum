@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
  * If the input param was {@link String}, only "true"(ignore case) will be regarded as true.
  *
  * <p>
- * If the input param was other type, it will throw an
+ * If the input param was other type, it will throw {@link TypeHandleException}
  */
 public class BooleanTypeHandler extends AbstractTypeHandler {
 
@@ -38,13 +38,13 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
                 setStringParam(ps, index, valueHolder);
             } else {
                 throw new Exception(String
-                    .format("the type of %s's value <%s> is %s, can not be converted to boolean",
+                    .format("The type of %s's value <%s> is %s, can not be converted to boolean",
                         valueHolder.getParamName(), valueHolder.getVal().toString(),
                         valueHolder.getVal().getClass().getName()));
             }
         } catch (Exception e) {
             throw new TypeHandleException(String
-                .format("failed to handle parameter<%s>, input val is <%s>",
+                .format("Failed to handle parameter<%s>, input val is <%s>",
                     valueHolder.getParamName(), valueHolder.getVal()), e);
         }
     }
@@ -54,7 +54,7 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
         throws TypeHandleException {
         if (StringUtils.isBlank(valueHolder.getDefaultExp())) {
             throw new TypeHandleException(String
-                .format("parameter<%s> not found and default expression of %s is not defined",
+                .format("Parameter<%s> not found and default expression of %s is not defined",
                     valueHolder.getParamName(), valueHolder.getParamName()));
         }
 
@@ -64,12 +64,12 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
             } else if (StringUtils.equals("false", valueHolder.getDefaultExp().toLowerCase())) {
                 ps.setBoolean(index, false);
             } else {
-                throw new Exception(String.format("value <%s> of <%s> can't be parsed to boolean",
+                throw new Exception(String.format("Value <%s> of <%s> can't be parsed to boolean",
                     valueHolder.getDefaultExp(), valueHolder.getParamName()));
             }
         } catch (Exception e) {
             throw new TypeHandleException(String
-                .format("failed to handel parameter<%s> through default expression <%s>",
+                .format("Failed to handel parameter<%s> through default expression <%s>",
                     valueHolder.getParamName(), valueHolder.getDefaultExp()), e);
         }
 
@@ -98,7 +98,7 @@ public class BooleanTypeHandler extends AbstractTypeHandler {
         } else if (StringUtils.equals("false", ((String) valueHolder.getVal()).toLowerCase())) {
             ps.setBoolean(index, false);
         } else {
-            throw new Exception(String.format("value <%s> of <%s> can't be parsed to boolean",
+            throw new Exception(String.format("Value <%s> of <%s> can't be parsed to boolean",
                 valueHolder.getVal().toString(), valueHolder.getParamName()));
         }
     }

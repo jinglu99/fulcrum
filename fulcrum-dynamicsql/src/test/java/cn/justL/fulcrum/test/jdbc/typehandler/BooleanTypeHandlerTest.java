@@ -1,9 +1,8 @@
 package cn.justL.fulcrum.test.jdbc.typehandler;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.BooleanTypeHandler;
-import cn.justl.fulcrum.jdbc.typehandler.IntegerTypeHandler;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandler;
 import java.io.IOException;
 import java.sql.SQLException;

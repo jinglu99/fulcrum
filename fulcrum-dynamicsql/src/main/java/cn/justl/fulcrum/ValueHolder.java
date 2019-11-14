@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.data;
+package cn.justl.fulcrum;
 
 /**
  * @Date : 2019-10-29

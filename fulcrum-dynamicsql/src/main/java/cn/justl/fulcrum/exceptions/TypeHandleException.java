@@ -5,7 +5,7 @@ package cn.justl.fulcrum.exceptions;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class TypeHandleException extends Exception {
+public class TypeHandleException extends DynamicSqlException {
 
     public TypeHandleException(String message) {
         super(message);

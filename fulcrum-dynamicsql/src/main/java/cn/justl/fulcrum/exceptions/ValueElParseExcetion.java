@@ -5,7 +5,7 @@ package cn.justl.fulcrum.exceptions;
  * @Author : jinglu.wang[jingl.wang123@gmail.com]
  * @Desc :
  */
-public class ValueElParseExcetion extends Exception {
+public class ValueElParseExcetion extends DynamicSqlException {
     public ValueElParseExcetion(String message) {
         super(message);
     }

@@ -1,14 +1,10 @@
 package cn.justL.fulcrum.test.jdbc.typehandler;
 
-import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.IntegerTypeHandler;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandler;
-import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.util.List;
-import org.hsqldb.jdbc.JDBCPreparedStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
 /**
  * @Date : 2019-11-06

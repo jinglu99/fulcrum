@@ -1,10 +1,12 @@
 package cn.justL.fulcrum.test.jdbc;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.jdbc.FulcrumStatement;
 import cn.justl.fulcrum.script.BoundSql;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FulcrumStatementTest extends DBTest {
 
     private Connection conn;
-    private BoundSql sr;
 
     @BeforeAll
     public static void setup() throws SQLException, ClassNotFoundException, IOException {
@@ -35,17 +36,17 @@ public class FulcrumStatementTest extends DBTest {
     @BeforeEach
     public void connect() throws SQLException, ClassNotFoundException {
         conn = createConnection();
-
-        sr = new BoundSql() {{
-            setSql(new StringBuilder("select * from author where id = ?"));
-        }};
-
-        sr.addValue(new ValueHolder("id", 101, null, null));
     }
 
     @Test
     public void simpleTest() throws StatementExecuteException, SQLException {
-        FulcrumStatement statement = new FulcrumStatement(conn, sr);
+
+        String sql = "select * from author where id = ?";
+        List<ValueHolder> valueHolders = new ArrayList() {{
+            add(new ValueHolder("id", 101, null, null));
+        }};
+
+        FulcrumStatement statement = new FulcrumStatement(conn, sql, valueHolders);
         ResultSet rs = statement.execute();
         assertNotNull(rs);
 
@@ -59,14 +60,24 @@ public class FulcrumStatementTest extends DBTest {
     @Test
     public void simpleTestWhenConnIsClosed() throws SQLException, StatementExecuteException {
         conn.close();
+
+        String sql = "select * from author where id = ?";
+        List<ValueHolder> valueHolders = new ArrayList() {{
+            add(new ValueHolder("id", 101, null, null));
+        }};
         assertThrows(StatementExecuteException.class, () -> {
-            FulcrumStatement statement = new FulcrumStatement(conn, sr);
+            FulcrumStatement statement = new FulcrumStatement(conn, sql, valueHolders);
         });
     }
 
     @Test
     public void connectionClosedBeforeExecute() throws StatementExecuteException, SQLException {
-        FulcrumStatement statement = new FulcrumStatement(conn, sr);
+        String sql = "select * from author where id = ?";
+        List<ValueHolder> valueHolders = new ArrayList() {{
+            add(new ValueHolder("id", 101, null, null));
+        }};
+
+        FulcrumStatement statement = new FulcrumStatement(conn, sql, valueHolders);
         conn.close();
         assertThrows(StatementExecuteException.class, () -> {
             statement.execute();

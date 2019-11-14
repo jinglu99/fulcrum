@@ -5,7 +5,7 @@ package cn.justl.fulcrum.exceptions;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class DynamicSqlConstructionException extends Exception {
+public class DynamicSqlConstructionException extends DynamicSqlException {
     public DynamicSqlConstructionException(String message) {
         super(message);
     }

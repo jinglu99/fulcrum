@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.jdbc;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.StatementExecuteException;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import cn.justl.fulcrum.jdbc.typehandler.TypeHandlerResolver;
@@ -27,12 +27,12 @@ public class FulcrumStatement {
     private final String sql;
     private final List<ValueHolder> values;
 
-    public FulcrumStatement(Connection conn, BoundSql sr) throws StatementExecuteException {
+    public FulcrumStatement(Connection conn, String sql, List<ValueHolder> valueHolders) throws StatementExecuteException {
         try {
             this.conn = conn;
-            sql = sr.getSql().toString();
-            values = sr.getValueHolders();
-            preparedStatement = conn.prepareStatement(sr.getSql().toString());
+            this.sql = sql;
+            values = valueHolders;
+            preparedStatement = conn.prepareStatement(sql);
         } catch (Exception e) {
             throw new StatementExecuteException("fail to prepare statement", e);
         }

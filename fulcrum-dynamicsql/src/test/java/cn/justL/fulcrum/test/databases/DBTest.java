@@ -95,7 +95,7 @@ public class DBTest {
         return true;
     }
 
-    private static List<Map> convertList(ResultSet rs) throws SQLException {
+    protected static List<Map> convertList(ResultSet rs) throws SQLException {
 
         List list = new ArrayList();
 

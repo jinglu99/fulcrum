@@ -6,6 +6,7 @@ import cn.justl.fulcrum.DynamicSQLParams;
 import cn.justl.fulcrum.DynamicSQLResult;
 import cn.justl.fulcrum.DynamicSQL;
 import cn.justl.fulcrum.exceptions.DynamicSqlConstructionException;
+import cn.justl.fulcrum.exceptions.DynamicSqlException;
 import cn.justl.fulcrum.exceptions.DynamicSqlExecutionException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +29,8 @@ import java.util.Map;
  * @Desc :
  */
 @DisplayName("Test for DynamicSQLExecutor")
-public class DynamicSQLExecutorTest extends DBTest {
+public class DynamicExecutorTest extends DBTest {
     public Connection conn;
-
 
     private static final String dynamicSqlPath = "/cn/justL/fulcrum/test/xmls/dynamicSql.xml";
     private static final String staticSqlPath = "/cn/justL/fulcrum/test/xmls/staticSql.xml";
@@ -48,72 +48,47 @@ public class DynamicSQLExecutorTest extends DBTest {
     }
 
     @Test
-    public void dynamicSqlExecutorSimpleTest() throws DynamicSqlConstructionException, DynamicSqlExecutionException {
+    public void dynamicSqlExecutorSimpleTest()
+        throws DynamicSqlException, SQLException, ClassNotFoundException {
         DynamicSQL dynamicSql = new DynamicSQL();
-        dynamicSql.setSql(DynamicSQLExecutorTest.class.getResourceAsStream(dynamicSqlPath));
+        dynamicSql.setSql(DynamicExecutorTest.class.getResourceAsStream(dynamicSqlPath));
 
+
+        String goalSql1 = "select itemid, productid, listprice, unitcost, supplier, status, attr2 from item where 1 = 1 and itemid = 'EST-1'";
         DynamicSQLExecutor executor = new DynamicSQLExecutor(dynamicSql);
-
-        // select
-        //    itemid, productid, listprice, unitcost, supplier, status
-        //    from table
-        //    where 1 = 1
-        //      and itemid = 'EST-1'
-
+        List<Map> goalResult1 = executeSql(goalSql1);
         DynamicSQLParams params1 = new DynamicSQLParams();
         params1.setParams(new HashMap() {{
             put("itemId", "EST-1");
         }});
         params1.setConnection(conn);
         DynamicSQLResult rs1 = executor.execute(params1);
-
         assertNotNull(rs1);
-        assertEquals(1, rs1.getResult().size());
-        Map firstRowData = rs1.getResult().get(0);
-        assertNotNull(firstRowData);
-        assertFalse(firstRowData.containsKey("attr1"));
-        assertTrue(firstRowData.containsKey("attr2"));
-        assertNull(firstRowData.get("attr2"));
-        assertEquals("FI-SW-01", firstRowData.get("productid"));
+        assertNotNull(rs1.getResult());
+        assertTrue(compareResult(goalResult1, rs1.getResult()));
 
 
-        // select
-        //    itemid, productid, listprice, unitcost, supplier, status
-        //    from table
-        //    where 1 = 1
-        //      and itemid = 'EST-1'
-
+        String goalSql2 = "select itemid, productid, listprice, unitcost, supplier, status, attr2 from item where 1 = 1 and (1=2 or itemid = 'EST-1' or itemid = 'EST-2')";
+        List<Map> goalResult2 = executeSql(goalSql1);
         DynamicSQLParams params2 = new DynamicSQLParams();
         params2.setParams(new HashMap() {{
             put("itemIds", Arrays.asList("EST-1","EST-2"));
         }});
         params2.setConnection(conn);
         DynamicSQLResult rs2 = executor.execute(params2);
-
-
-        // select
-        //    itemid, productid, listprice, unitcost, supplier, status
-        //    from table
-        //    where 1 = 1
-        //      and (1 = 2 or itemid = 'EST-1' or itemid = 'EST-2')
         assertNotNull(rs2);
-        assertEquals(2, rs2.getResult().size());
-        Map firstRowData1 = rs2.getResult().get(0);
-        assertNotNull(firstRowData1);
-        assertFalse(firstRowData1.containsKey("attr1"));
-        assertTrue(firstRowData1.containsKey("attr2"));
-        assertNull(firstRowData1.get("attr2"));
-        assertEquals("FI-SW-01", firstRowData1.get("productid"));
+        assertNotNull(rs2.getResult());
+        assertTrue(compareResult(goalResult2, rs2.getResult()));
     }
 
 
     @Test
-    public void staticSqlTest() throws SQLException, ClassNotFoundException, DynamicSqlConstructionException, DynamicSqlExecutionException {
+    public void staticSqlTest() throws SQLException, ClassNotFoundException, DynamicSqlException {
         String targetSql = "select * from author where id = 101";
         List goalResult = executeSql(targetSql);
 
         DynamicSQL dynamicSql = new DynamicSQL();
-        dynamicSql.setSql(DynamicSQLExecutorTest.class.getResourceAsStream(staticSqlPath));
+        dynamicSql.setSql(DynamicExecutorTest.class.getResourceAsStream(staticSqlPath));
         DynamicSQLExecutor executor = new DynamicSQLExecutor(dynamicSql);
 
 

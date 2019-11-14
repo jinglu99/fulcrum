@@ -1,8 +1,0 @@
-<Sql>
-    select *
-    from
-    dbk_fee
-    where
-    1=1
-    and price = {$price:int:0}
-</Sql>

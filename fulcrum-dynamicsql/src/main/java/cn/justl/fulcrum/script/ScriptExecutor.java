@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.script;
 
-import cn.justl.fulcrum.data.ExecuteContext;
-import cn.justl.fulcrum.data.ScriptContext;
+import cn.justl.fulcrum.ExecuteContext;
+import cn.justl.fulcrum.Executor;
 import cn.justl.fulcrum.exceptions.DynamicSQLParseException;
 import cn.justl.fulcrum.exceptions.ScriptFailedException;
 import cn.justl.fulcrum.parser.XMLSqlParser;
@@ -15,13 +15,12 @@ import java.io.InputStream;
  * A ScriptRunner is the executor of dynamic sql script, the dynamic sql will be parsed to a
  * group of {@link ScriptHandler} in it's constructor.
  */
-public final class ScriptRunner {
+public final class ScriptExecutor implements Executor {
 
-    private final XMLSqlParser parser;
-    private final ScriptHandler handler;
+    private XMLSqlParser parser;
+    private ScriptHandler handler;
 
-
-    public ScriptRunner(InputStream dynamicSql) throws DynamicSQLParseException {
+    public void parse(InputStream dynamicSql) throws DynamicSQLParseException {
         parser = new XMLSqlParser(dynamicSql);
         handler = parser.parse();
     }
@@ -34,11 +33,11 @@ public final class ScriptRunner {
      */
     public void execute(ExecuteContext context) throws ScriptFailedException {
         ScriptContext scriptContext = new ScriptContext();
-        scriptContext.setParams(context.getDynamicSQLParams().getParams());
+        scriptContext.setParams(context.getParams());
 
         BoundSql boundSql = handler.process(scriptContext);
 
-        context.setScriptContext(scriptContext);
-        context.setBoundSql(boundSql);
+        context.setSql(boundSql.getSql().toString());
+        context.setValueHolders(boundSql.getValueHolders());
     }
 }

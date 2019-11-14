@@ -1,12 +1,10 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,13 +22,21 @@ public class OtherTypeHandler extends AbstractTypeHandler {
 
 
     @Override
-    public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
-
+    public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder)
+        throws TypeHandleException {
+        try {
+            ps.setObject(index, valueHolder.getVal());
+        } catch (SQLException e) {
+            throw new TypeHandleException(String
+                .format("Can't set parameter for %s with value %s", valueHolder.getParamName(),
+                    valueHolder.getVal()), e);
+        }
     }
 
     @Override
-    public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws TypeHandleException {
-
+    public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder)
+        throws TypeHandleException {
+        throw new TypeHandleException(String.format("The parameter %s is not found!", valueHolder.getVal()));
     }
 
     @Override

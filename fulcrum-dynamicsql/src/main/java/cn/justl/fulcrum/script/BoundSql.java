@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.script;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 
 import java.util.ArrayList;
 import java.util.List;

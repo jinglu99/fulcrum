@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.data.ValueHolder;
+import cn.justl.fulcrum.ValueHolder;
 import cn.justl.fulcrum.exceptions.TypeHandleException;
 import org.apache.commons.lang3.StringUtils;
 

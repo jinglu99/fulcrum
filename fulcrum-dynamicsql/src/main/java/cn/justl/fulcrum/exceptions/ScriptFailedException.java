@@ -5,7 +5,7 @@ package cn.justl.fulcrum.exceptions;
  * @Author : jingl.wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class ScriptFailedException extends Exception {
+public class ScriptFailedException extends DynamicSqlException {
     public ScriptFailedException(String message) {
         super(message);
     }
