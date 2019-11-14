@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://jingl.wang/fulcrum-dynamic-sql.xsd"
+           xmlns="http://jingl.wang/fulcrum-dynamic-sql.xsd"
+>
+
+    <xs:element name="SQL">
+        <xs:complexType mixed="true">
+            <xs:group ref="mixElementGroup"/>
+        </xs:complexType>
+    </xs:element>
+
+
+    <!--    if element-->
+    <xs:element name="if">
+        <xs:complexType>
+            <xs:sequence minOccurs="0">
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="case"/>
+                </xs:choice>
+                <xs:choice minOccurs="0" maxOccurs="1">
+                    <xs:element ref="else"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="case">
+        <xs:complexType mixed="true">
+            <xs:group ref="mixElementGroup"/>
+            <xs:attribute name="cond" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="else">
+        <xs:complexType mixed="true">
+            <xs:group ref="mixElementGroup"/>
+            <xs:attribute name="cond"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!--    for element-->
+    <xs:element name="for">
+        <xs:complexType mixed="true">
+            <xs:group ref="mixElementGroup"/>
+            <xs:attribute name="collection" type="xs:string" use="required"/>
+            <xs:attribute name="item" type="xs:string" use="required"/>
+            <xs:attribute name="index" type="xs:attribute"/>
+            <xs:attribute name="separator" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:group name="mixElementGroup">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="if"/>
+                <xs:element ref="for"/>
+                <!--                <xs:any minOccurs="0"/>-->
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+
+
+</xs:schema>

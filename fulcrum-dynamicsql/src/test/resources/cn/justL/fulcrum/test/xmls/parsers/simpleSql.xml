@@ -1,0 +1,3 @@
+<SQL xmlns="http://jingl.wang/fulcrum-dynamic-sql.xsd">
+  select * from table
+</SQL>

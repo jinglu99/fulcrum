@@ -1,0 +1,20 @@
+<SQL xmlns="http://jingl.wang/fulcrum-dynamic-sql.xsd">
+    select
+    itemid, productid, listprice, unitcost, supplier, status, attr2
+    from item
+    where 1 = 1
+    <if>
+        <case cond="itemId != nil">
+            and itemid = {$itemId}
+        </case>
+    </if>
+    <if>
+        <case cond="itemIds != nil">
+            and ( 1 = 2
+            <for collection="itemIds" item="item">
+                or itemid = {$item}
+            </for>
+            )
+        </case>
+    </if>
+</SQL>

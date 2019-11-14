@@ -1,10 +1,11 @@
 package cn.justl.fulcrum.jdbc.typehandler;
 
-import cn.justl.fulcrum.contexts.ValueHolder;
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.ValueHolder;
+import cn.justl.fulcrum.exceptions.TypeHandleException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * @Date : 2019/10/25
@@ -19,23 +20,32 @@ public class OtherTypeHandler extends AbstractTypeHandler {
         return instance;
     }
 
-    public void setNonNullParam(PreparedStatement ps, int index, Object val) throws SQLException {
-        ps.setObject(index, val);
+
+    @Override
+    public void setNonNullParam(PreparedStatement ps, int index, ValueHolder valueHolder)
+        throws TypeHandleException {
+        try {
+            ps.setObject(index, valueHolder.getVal());
+        } catch (SQLException e) {
+            throw new TypeHandleException(String
+                .format("Can't set parameter for %s with value %s", valueHolder.getParamName(),
+                    valueHolder.getVal()), e);
+        }
     }
 
     @Override
-    void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder) throws SQLException, ScriptFailedException {
-        ps.setString(index, valueHolder.getDefaultExp());
-    }
-
-
-    @Override
-    public boolean isMatchByType(ValueHolder valueHolder) {
-        return true;
+    public void setNullParam(PreparedStatement ps, int index, ValueHolder valueHolder)
+        throws TypeHandleException {
+        throw new TypeHandleException(String.format("The parameter %s is not found!", valueHolder.getVal()));
     }
 
     @Override
-    public boolean isMatchByTypeName(ValueHolder valueHolder) {
-        return true;
+    public Set<String> getSupportTypeNames() {
+        return null;
+    }
+
+    @Override
+    public Set<Class> getSupportTypes() {
+        return null;
     }
 }
