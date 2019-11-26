@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.core.verticles;
 
-import cn.justl.fulcrum.vertxboot.annotation.HttpVerticle;
+import cn.justl.fulcrum.vertxboot.annotation.Start;
 import cn.justl.fulcrum.vertxboot.annotation.Verticle;
 
 /**
@@ -8,7 +8,11 @@ import cn.justl.fulcrum.vertxboot.annotation.Verticle;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@HttpVerticle
+@Verticle
 public class TestVerticle {
 
+    @Start
+    public void start() {
+        System.out.println("test");
+    }
 }

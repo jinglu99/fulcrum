@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.vertxboot.context;
 
+import cn.justl.fulcrum.vertxboot.VerticleHolder;
 import io.vertx.core.Vertx;
 import java.util.List;
 
@@ -21,16 +22,12 @@ public interface Context {
      */
     void setVertx(Vertx vertx);
 
-    List<Class> listVerticles();
+    List<Class> listVerticleClasses();
 
-    void addVerticle(Class verticle);
+    void registerVerticleClass(Class verticle);
 
-    void registerVerticleClass(String name, Class verticleClazz);
+    VerticleHolder getVerticle(String name);
 
-    Class getVerticleClass(String name);
-
-    Object getVerticle(String name);
-
-    void registerVerticle(String name, Object verticle);
+    void registerVerticle(String name, VerticleHolder verticle);
 
 }

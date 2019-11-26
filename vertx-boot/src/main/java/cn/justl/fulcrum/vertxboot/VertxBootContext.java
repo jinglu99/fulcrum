@@ -32,32 +32,22 @@ public class VertxBootContext implements Context {
     }
 
     @Override
-    public List<Class> listVerticles() {
-        return delegate.listVerticles();
+    public List<Class> listVerticleClasses() {
+        return delegate.listVerticleClasses();
     }
 
     @Override
-    public void addVerticle(Class verticle) {
-        delegate.addVerticle(verticle);
+    public void registerVerticleClass(Class verticle) {
+        delegate.registerVerticleClass(verticle);
     }
 
     @Override
-    public Class getVerticleClass(String name) {
-        return delegate.getVerticleClass(name);
-    }
-
-    @Override
-    public void registerVerticle(String name, Object verticle) {
-        delegate.registerVerticle(name, verticle);
-    }
-
-    @Override
-    public Object getVerticle(String name) {
+    public VerticleHolder getVerticle(String name) {
         return delegate.getVerticle(name);
     }
 
     @Override
-    public void registerVerticleClass(String name, Class verticle) {
-        delegate.registerVerticleClass(name, verticle);
+    public void registerVerticle(String name, VerticleHolder verticle) {
+        delegate.registerVerticle(name, verticle);
     }
 }

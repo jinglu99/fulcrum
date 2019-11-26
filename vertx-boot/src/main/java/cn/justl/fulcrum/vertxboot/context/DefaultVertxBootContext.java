@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.vertxboot.context;
 
+import cn.justl.fulcrum.vertxboot.VerticleHolder;
 import cn.justl.fulcrum.vertxboot.context.Context;
 import io.vertx.core.Vertx;
 import java.util.ArrayList;
@@ -18,9 +19,8 @@ public class DefaultVertxBootContext implements Context {
 
     private Vertx vertx;
 
-    private Set<Class> verticleList = new HashSet<>();
-    private Map<String, Class> verticleClasses = new HashMap<>();
-    private Map<String, Object> verticleObjs = new HashMap<>();
+    private Set<Class> verticleClasses = new HashSet<>();
+    private Map<String, VerticleHolder> verticles = new HashMap<>();
 
     @Override
     public Vertx getVertx() {
@@ -33,32 +33,24 @@ public class DefaultVertxBootContext implements Context {
     }
 
     @Override
-    public List<Class> listVerticles() {
-        return new ArrayList<>(verticleList);
+    public List<Class> listVerticleClasses() {
+        return new ArrayList<>(verticleClasses);
     }
 
     @Override
-    public synchronized void addVerticle(Class verticle) {
-        verticleList.add(verticle);
+    public synchronized void registerVerticleClass(Class verticle) {
+        verticleClasses.add(verticle);
     }
 
     @Override
-    public synchronized void registerVerticleClass(String name, Class verticleClazz) {
-        verticleClasses.put(name, verticleClazz);
+    public VerticleHolder getVerticle(String name) {
+        return verticles.get(name);
     }
 
     @Override
-    public Class getVerticleClass(String name) {
-        return verticleClasses.get(name);
+    public synchronized void registerVerticle(String name, VerticleHolder holder) {
+        verticles.put(name, holder);
     }
 
-    @Override
-    public Object getVerticle(String name) {
-        return verticleObjs.get(name);
-    }
 
-    @Override
-    public synchronized void registerVerticle(String name, Object verticle) {
-        verticleObjs.put(name, verticle);
-    }
 }

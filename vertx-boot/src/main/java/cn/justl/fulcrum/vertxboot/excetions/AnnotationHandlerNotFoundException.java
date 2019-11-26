@@ -5,7 +5,7 @@ package cn.justl.fulcrum.vertxboot.excetions;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class AnnotationHandlerNotFoundException extends AnnotationHandleException {
+public class AnnotationHandlerNotFoundException extends AnnotationScannerException {
 
     public AnnotationHandlerNotFoundException(String message) {
         super(message);

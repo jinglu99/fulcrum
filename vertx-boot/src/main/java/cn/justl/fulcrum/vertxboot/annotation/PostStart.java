@@ -6,13 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Date : 2019/11/24
- * @Author : Jingl.Wang [jingl.wang123@gmail.com]
+ * @Date : 2019-11-26
+ * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HttpVerticle{
-    String value() default "";
-    String port() default "";
+public @interface PostStart {
 }
