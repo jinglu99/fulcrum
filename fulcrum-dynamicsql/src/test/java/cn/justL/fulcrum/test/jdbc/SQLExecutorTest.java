@@ -1,9 +1,9 @@
 package cn.justL.fulcrum.test.jdbc;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.ExecuteContext;
-import cn.justl.fulcrum.exceptions.DynamicSqlException;
-import cn.justl.fulcrum.jdbc.SQLExecutor;
+import cn.justl.fulcrum.dynamicsql.ExecuteContext;
+import cn.justl.fulcrum.dynamicsql.exceptions.DynamicSqlException;
+import cn.justl.fulcrum.dynamicsql.jdbc.SQLExecutor;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;

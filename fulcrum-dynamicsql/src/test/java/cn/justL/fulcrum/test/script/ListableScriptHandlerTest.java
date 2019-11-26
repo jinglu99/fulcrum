@@ -1,13 +1,13 @@
 package cn.justL.fulcrum.test.script;
 
-import cn.justl.fulcrum.script.ScriptContext;
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.script.ScriptHandler;
-import cn.justl.fulcrum.script.BoundSql;
-import cn.justl.fulcrum.script.handlers.ForeachScriptHandler;
-import cn.justl.fulcrum.script.handlers.IfScriptHandler;
-import cn.justl.fulcrum.script.handlers.ListableScriptHandler;
-import cn.justl.fulcrum.script.handlers.TextScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.ScriptContext;
+import cn.justl.fulcrum.dynamicsql.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.dynamicsql.script.ScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.BoundSql;
+import cn.justl.fulcrum.dynamicsql.script.handlers.ForeachScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.IfScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.ListableScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.TextScriptHandler;
 import java.util.Arrays;
 import java.util.HashMap;
 import org.junit.jupiter.api.DisplayName;

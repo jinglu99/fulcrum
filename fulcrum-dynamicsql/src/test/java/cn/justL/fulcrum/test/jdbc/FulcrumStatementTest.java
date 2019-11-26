@@ -1,10 +1,9 @@
 package cn.justL.fulcrum.test.jdbc;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.ValueHolder;
-import cn.justl.fulcrum.exceptions.StatementExecuteException;
-import cn.justl.fulcrum.jdbc.FulcrumStatement;
-import cn.justl.fulcrum.script.BoundSql;
+import cn.justl.fulcrum.dynamicsql.ValueHolder;
+import cn.justl.fulcrum.dynamicsql.exceptions.StatementExecuteException;
+import cn.justl.fulcrum.dynamicsql.jdbc.FulcrumStatement;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;

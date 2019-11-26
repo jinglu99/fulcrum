@@ -1,17 +1,17 @@
 package cn.justL.fulcrum.test.parser;
 
-import cn.justl.fulcrum.exceptions.ScriptFailedException;
-import cn.justl.fulcrum.exceptions.DynamicSQLParseException;
-import cn.justl.fulcrum.parser.XMLParserConstants;
-import cn.justl.fulcrum.parser.XMLSqlParser;
-import cn.justl.fulcrum.script.ScriptHandler;
+import cn.justl.fulcrum.dynamicsql.exceptions.ScriptFailedException;
+import cn.justl.fulcrum.dynamicsql.exceptions.DynamicSQLParseException;
+import cn.justl.fulcrum.dynamicsql.parser.XMLParserConstants;
+import cn.justl.fulcrum.dynamicsql.parser.XMLSqlParser;
+import cn.justl.fulcrum.dynamicsql.script.ScriptHandler;
 
 import java.io.IOException;
 
-import cn.justl.fulcrum.script.handlers.ForeachScriptHandler;
-import cn.justl.fulcrum.script.handlers.IfScriptHandler;
-import cn.justl.fulcrum.script.handlers.ListableScriptHandler;
-import cn.justl.fulcrum.script.handlers.TextScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.ForeachScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.IfScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.ListableScriptHandler;
+import cn.justl.fulcrum.dynamicsql.script.handlers.TextScriptHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

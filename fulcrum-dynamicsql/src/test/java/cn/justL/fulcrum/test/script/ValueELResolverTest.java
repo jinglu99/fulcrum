@@ -1,8 +1,8 @@
 package cn.justL.fulcrum.test.script;
 
-import cn.justl.fulcrum.ValueHolder;
-import cn.justl.fulcrum.exceptions.ValueElParseExcetion;
-import cn.justl.fulcrum.script.ValueELResolver;
+import cn.justl.fulcrum.dynamicsql.ValueHolder;
+import cn.justl.fulcrum.dynamicsql.exceptions.ValueElParseExcetion;
+import cn.justl.fulcrum.dynamicsql.script.ValueELResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

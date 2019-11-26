@@ -1,13 +1,11 @@
 package cn.justL.fulcrum.test;
 
 import cn.justL.fulcrum.test.databases.DBTest;
-import cn.justl.fulcrum.DynamicSQLExecutor;
-import cn.justl.fulcrum.DynamicSQLParams;
-import cn.justl.fulcrum.DynamicSQLResult;
-import cn.justl.fulcrum.DynamicSQL;
-import cn.justl.fulcrum.exceptions.DynamicSqlConstructionException;
-import cn.justl.fulcrum.exceptions.DynamicSqlException;
-import cn.justl.fulcrum.exceptions.DynamicSqlExecutionException;
+import cn.justl.fulcrum.dynamicsql.DynamicSQLExecutor;
+import cn.justl.fulcrum.dynamicsql.DynamicSQLParams;
+import cn.justl.fulcrum.dynamicsql.DynamicSQLResult;
+import cn.justl.fulcrum.dynamicsql.DynamicSQL;
+import cn.justl.fulcrum.dynamicsql.exceptions.DynamicSqlException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
