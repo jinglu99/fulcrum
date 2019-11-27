@@ -5,7 +5,7 @@ package cn.justl.fulcrum.vertxboot.definition;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public interface VerticleDefinition {
+public interface VerticleDefinition<T> {
 
     /**
      * Set ID for Verticle.
@@ -21,14 +21,24 @@ public interface VerticleDefinition {
     /**
      * Set Class for verticle.
      */
-    void setClazz(Class clazz);
+    void setClazz(Class<T> clazz);
 
     /**
      * Get the Class of Verticle.
      * @return
      */
-    Class getClazz();
+    Class<T> getClazz();
 
+    /**
+     * Set dependOn parameter for verticle.
+     * @param dependOn
+     */
+    void setDependOn(String[] dependOn);
 
+    /**
+     * Get dependOn parameter for verticle.
+     * @return
+     */
+    String[] getDependOn();
 
 }

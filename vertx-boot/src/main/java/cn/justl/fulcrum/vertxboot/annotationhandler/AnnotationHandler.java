@@ -1,8 +1,10 @@
 package cn.justl.fulcrum.vertxboot.annotationhandler;
 
 import cn.justl.fulcrum.vertxboot.VerticleHolder;
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
 import cn.justl.fulcrum.vertxboot.excetions.AnnotationScannerException;
 import cn.justl.fulcrum.vertxboot.excetions.VerticleInitializeException;
+import cn.justl.fulcrum.vertxboot.excetions.VerticleInstantiateException;
 
 import java.util.Set;
 
@@ -13,9 +15,11 @@ import java.util.Set;
  */
 public interface AnnotationHandler {
 
-    Set<Class> scan(String packageName) throws AnnotationScannerException;
+    Set<VerticleDefinition> scan(String packageName) throws AnnotationScannerException;
 
-    <T> VerticleHolder<T> initialize(Class<T> clazz) throws VerticleInitializeException;
+    <T> VerticleHolder<T> instantiate(VerticleDefinition<T> verticleHolder) throws VerticleInstantiateException;
+
+    <T> VerticleHolder<T> initialize(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleInitializeException;
 
     boolean satisfied(Class clazz);
 

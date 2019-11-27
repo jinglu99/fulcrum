@@ -5,7 +5,7 @@ package cn.justl.fulcrum.vertxboot.excetions;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class VerticleInstantiateException extends VerticleInitializeException {
+public class VerticleInstantiateException extends VertxBootInitializeException {
 
     public VerticleInstantiateException() {
     }

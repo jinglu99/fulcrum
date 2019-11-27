@@ -1,30 +1,34 @@
 package cn.justl.fulcrum.vertxboot;
 
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
+
 /**
  * @Date : 2019-11-27
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
 public class  VerticleHolder<T> {
-    private String name;
+    private String id;
 
     private T verticle;
+
+    private VerticleDefinition verticleDefinition;
 
 
     public VerticleHolder() {
     }
 
-    public VerticleHolder(String name, T verticle) {
-        this.name = name;
+    public VerticleHolder(String id, T verticle) {
+        this.id = id;
         this.verticle = verticle;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public T getVerticle() {
@@ -33,5 +37,22 @@ public class  VerticleHolder<T> {
 
     public void setVerticle(T verticle) {
         this.verticle = verticle;
+    }
+
+
+    public VerticleDefinition getVerticleDefinition() {
+        return verticleDefinition;
+    }
+
+    public void setVerticleDefinition(VerticleDefinition verticleDefinition) {
+        this.verticleDefinition = verticleDefinition;
+    }
+
+    @Override
+    public String toString() {
+        return "VerticleHolder{" +
+                "id='" + id + '\'' +
+                ", verticle=" + verticle +
+                '}';
     }
 }

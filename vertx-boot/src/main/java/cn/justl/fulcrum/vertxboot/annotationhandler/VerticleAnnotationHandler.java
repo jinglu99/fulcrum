@@ -5,9 +5,14 @@ import cn.justl.fulcrum.vertxboot.VerticleHolder;
 import cn.justl.fulcrum.vertxboot.context.VertxBootContext;
 import cn.justl.fulcrum.vertxboot.annotation.Start;
 import cn.justl.fulcrum.vertxboot.annotation.Verticle;
+import cn.justl.fulcrum.vertxboot.definition.DefaultVerticleDefinition;
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
 import cn.justl.fulcrum.vertxboot.excetions.AnnotationScannerException;
 import cn.justl.fulcrum.vertxboot.excetions.VerticleInitializeException;
+import cn.justl.fulcrum.vertxboot.excetions.VerticleStartException;
 import io.vertx.core.Vertx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,37 +28,36 @@ import java.util.stream.Collectors;
  * @Desc :
  */
 public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
+    private static final Logger logger = LoggerFactory.getLogger(VerticleAnnotationHandler.class);
+
+
     @Override
-    public Set<Class> scan(String packageName) throws AnnotationScannerException {
-        return ClassHelper.scan(packageName, clazz ->
-                clazz.getDeclaredAnnotation(Verticle.class) != null
-        );
+    boolean isTargetVerticle(Class clazz) {
+        return clazz.getDeclaredAnnotation(Verticle.class) != null;
     }
 
     @Override
-    public <T> VerticleHolder<T> initialize(Class<T> clazz) throws VerticleInitializeException {
+    VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
+        Verticle verticle = (Verticle) clazz.getAnnotation(Verticle.class);
+        VerticleDefinition definition = new DefaultVerticleDefinition();
+
+        String id = verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase() + clazz.getSimpleName().substring(1) : verticle.value();
+        definition.setId(id);
+        definition.setClazz(clazz);
+
+        return definition;
+    }
+
+
+    @Override
+    <T> void doStart(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException {
         try {
-            Verticle verticle = clazz.getDeclaredAnnotation(Verticle.class);
-
-            String name = verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase() + clazz.getSimpleName().substring(1) : verticle.value();
-
-            T obj = instantiate(clazz);
-
-            injectVertx(clazz, obj);
-
-            callPreStart(clazz, obj);
-
-            callStart(clazz, obj);
-
-            callPostStart(clazz, obj);
-
-            return new VerticleHolder<>(name, obj);
-        } catch (VerticleInitializeException e) {
-            throw e;
+            callStart(verticleDefinition.getClazz(), verticleHolder.getVerticle());
         } catch (Throwable e) {
-            throw new VerticleInitializeException("Failed to initialize Verticle " + clazz.getName(), e);
+            throw new VerticleStartException("Failed to execute start option", e);
         }
     }
+
 
     @Override
     public boolean satisfied(Class clazz) {
@@ -61,7 +65,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     }
 
 
-    public <T> void callStart(Class<T> clazz, T obj) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+    private  <T> void callStart(Class<T> clazz, T obj) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
         if ((methods = clazz.getDeclaredMethods()) == null) return;
 

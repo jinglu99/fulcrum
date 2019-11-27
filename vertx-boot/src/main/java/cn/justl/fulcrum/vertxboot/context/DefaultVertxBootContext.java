@@ -2,7 +2,11 @@ package cn.justl.fulcrum.vertxboot.context;
 
 import cn.justl.fulcrum.vertxboot.VerticleHolder;
 import cn.justl.fulcrum.vertxboot.context.Context;
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
 import io.vertx.core.Vertx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,10 +20,11 @@ import java.util.Set;
  * @Desc :
  */
 public class DefaultVertxBootContext implements Context {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultVertxBootContext.class);
 
     private Vertx vertx;
 
-    private Set<Class> verticleClasses = new HashSet<>();
+    private Map<String, VerticleDefinition> definitionMap = new HashMap<>();
     private Map<String, VerticleHolder> verticles = new HashMap<>();
 
     @Override
@@ -32,25 +37,44 @@ public class DefaultVertxBootContext implements Context {
         this.vertx = vertx;
     }
 
+
     @Override
-    public List<Class> listVerticleClasses() {
-        return new ArrayList<>(verticleClasses);
+    public VerticleDefinition getVerticleDefinition(String id) {
+        return definitionMap.get(id);
     }
 
     @Override
-    public synchronized void registerVerticleClass(Class verticle) {
-        verticleClasses.add(verticle);
+    public List<VerticleDefinition> listVerticleDefinitions() {
+        return new ArrayList<>(definitionMap.values());
     }
 
     @Override
-    public VerticleHolder getVerticle(String name) {
-        return verticles.get(name);
+    public synchronized void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
+        if (definitionMap.containsKey(verticleDefinition.getId())) {
+            logger.warn("VerticleDefinition {}:{} has been registered, it will by replaced by {}",
+                    verticleDefinition.getId(), getVerticleDefinition(verticleDefinition.getId()).getClazz().getName(),
+                    verticleDefinition.getClazz().getName());
+        }
+        definitionMap.put(verticleDefinition.getId(), verticleDefinition);
     }
 
     @Override
-    public synchronized void registerVerticle(String name, VerticleHolder holder) {
-        verticles.put(name, holder);
+    public VerticleHolder getVerticleHolder(String id) {
+        return verticles.get(id);
     }
 
+    @Override
+    public List<VerticleHolder> listVerticleHolders() {
+        return new ArrayList<>(verticles.values());
+    }
 
+    @Override
+    public synchronized void registerVerticle(VerticleHolder verticleHolder) {
+        if (verticles.containsKey(verticleHolder.getId())) {
+            logger.warn("Verticle {}:{} has been registered, it will by replaced by {}",
+                    verticleHolder.getId(), getVerticleHolder(verticleHolder.getId()).getVerticle(),
+                    verticleHolder.getVerticle());
+        }
+        verticles.put(verticleHolder.getId(), verticleHolder);
+    }
 }

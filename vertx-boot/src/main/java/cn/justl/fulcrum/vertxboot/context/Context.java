@@ -1,6 +1,7 @@
 package cn.justl.fulcrum.vertxboot.context;
 
 import cn.justl.fulcrum.vertxboot.VerticleHolder;
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
 import io.vertx.core.Vertx;
 import java.util.List;
 
@@ -11,23 +12,55 @@ import java.util.List;
  */
 public interface Context {
     /**
-     * get the {@link Vertx} Object
+     * get the {@link Vertx} Object.
      * @return
      */
     Vertx getVertx();
 
     /**
-     * set a {@link Vertx} Object
+     * set a {@link Vertx} Object.
      * @param vertx
      */
     void setVertx(Vertx vertx);
 
-    List<Class> listVerticleClasses();
+    /**
+     * Get a {@link VerticleDefinition} by given ID.
+     * @param id
+     * @return
+     */
+    VerticleDefinition getVerticleDefinition(String id);
 
-    void registerVerticleClass(Class verticle);
+    /**
+     * List all {@link VerticleDefinition} registered in Context.
+     * @return
+     */
+    List<VerticleDefinition> listVerticleDefinitions();
 
-    VerticleHolder getVerticle(String name);
+    /**
+     * register a {@link VerticleDefinition} in Context.
+     * @param verticleDefinition
+     */
+    void registerVerticleDefinition(VerticleDefinition verticleDefinition);
 
-    void registerVerticle(String name, VerticleHolder verticle);
+    /**
+     * Get a {@link VerticleHolder} by given ID.
+     * @param id
+     * @return
+     */
+    VerticleHolder getVerticleHolder(String id);
+
+
+    /**
+     * List all {@link VerticleHolder} registerd in Context.
+     * @return
+     */
+    List<VerticleHolder> listVerticleHolders();
+
+
+    /**
+     * Register a {@link VerticleHolder} in Context.
+     * @param verticleHolder
+     */
+    void registerVerticle(VerticleHolder verticleHolder);
 
 }

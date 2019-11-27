@@ -9,6 +9,7 @@ public class DefaultVerticleDefinition implements VerticleDefinition {
 
     private String id;
     private Class clazz;
+    private String[] dependOn;
 
 
     @Override
@@ -30,4 +31,15 @@ public class DefaultVerticleDefinition implements VerticleDefinition {
     public Class getClazz() {
         return this.clazz;
     }
+
+    @Override
+    public void setDependOn(String[] dependOn) {
+        this.dependOn = dependOn;
+    }
+
+    @Override
+    public String[] getDependOn() {
+        return this.dependOn;
+    }
+
 }

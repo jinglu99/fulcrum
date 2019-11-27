@@ -12,7 +12,7 @@ import io.vertx.core.Vertx;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@Verticle
+@Verticle("test")
 public class TestVerticle {
 
     @VertX

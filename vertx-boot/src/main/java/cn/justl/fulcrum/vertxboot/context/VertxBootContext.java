@@ -1,6 +1,7 @@
 package cn.justl.fulcrum.vertxboot.context;
 
 import cn.justl.fulcrum.vertxboot.VerticleHolder;
+import cn.justl.fulcrum.vertxboot.definition.VerticleDefinition;
 import io.vertx.core.Vertx;
 import java.util.List;
 
@@ -31,22 +32,32 @@ public class VertxBootContext implements Context {
     }
 
     @Override
-    public List<Class> listVerticleClasses() {
-        return delegate.listVerticleClasses();
+    public VerticleDefinition getVerticleDefinition(String id) {
+        return delegate.getVerticleDefinition(id);
     }
 
     @Override
-    public void registerVerticleClass(Class verticle) {
-        delegate.registerVerticleClass(verticle);
+    public List<VerticleDefinition> listVerticleDefinitions() {
+        return delegate.listVerticleDefinitions();
     }
 
     @Override
-    public VerticleHolder getVerticle(String name) {
-        return delegate.getVerticle(name);
+    public void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
+        delegate.registerVerticleDefinition(verticleDefinition);
     }
 
     @Override
-    public void registerVerticle(String name, VerticleHolder verticle) {
-        delegate.registerVerticle(name, verticle);
+    public VerticleHolder getVerticleHolder(String id) {
+        return delegate.getVerticleHolder(id);
+    }
+
+    @Override
+    public List<VerticleHolder> listVerticleHolders() {
+        return delegate.listVerticleHolders();
+    }
+
+    @Override
+    public void registerVerticle(VerticleHolder verticleHolder) {
+        delegate.registerVerticle(verticleHolder);
     }
 }
