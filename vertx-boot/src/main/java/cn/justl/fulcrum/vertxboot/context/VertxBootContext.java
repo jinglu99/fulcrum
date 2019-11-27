@@ -1,7 +1,6 @@
-package cn.justl.fulcrum.vertxboot;
+package cn.justl.fulcrum.vertxboot.context;
 
-import cn.justl.fulcrum.vertxboot.context.Context;
-import cn.justl.fulcrum.vertxboot.context.DefaultVertxBootContext;
+import cn.justl.fulcrum.vertxboot.VerticleHolder;
 import io.vertx.core.Vertx;
 import java.util.List;
 

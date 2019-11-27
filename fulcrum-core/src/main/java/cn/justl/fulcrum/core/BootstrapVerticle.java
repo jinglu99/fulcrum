@@ -1,6 +1,7 @@
 package cn.justl.fulcrum.core;
 
 import cn.justl.fulcrum.vertxboot.VertxBootStrap;
+import cn.justl.fulcrum.vertxboot.annotation.VertX;
 import cn.justl.fulcrum.vertxboot.annotation.VerticleScan;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -15,7 +16,11 @@ public class BootstrapVerticle extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
-        VertxBootStrap.run(vertx, BootstrapVerticle.class);
+        VertxBootStrap.run(vertx, BootstrapVerticle.class)
+            .otherwise(res->{
+                res.printStackTrace();
+                return null;
+            });
         startPromise.complete();
     }
 }

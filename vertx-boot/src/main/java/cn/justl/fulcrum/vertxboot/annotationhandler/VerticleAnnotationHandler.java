@@ -2,8 +2,7 @@ package cn.justl.fulcrum.vertxboot.annotationhandler;
 
 import cn.justl.fulcrum.vertxboot.ClassHelper;
 import cn.justl.fulcrum.vertxboot.VerticleHolder;
-import cn.justl.fulcrum.vertxboot.VertxBootContext;
-import cn.justl.fulcrum.vertxboot.annotation.PreStart;
+import cn.justl.fulcrum.vertxboot.context.VertxBootContext;
 import cn.justl.fulcrum.vertxboot.annotation.Start;
 import cn.justl.fulcrum.vertxboot.annotation.Verticle;
 import cn.justl.fulcrum.vertxboot.excetions.AnnotationScannerException;
@@ -86,8 +85,8 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
                 args[i] = VertxBootContext.getInstance().getVertx();
             }
         }
-
-        preStartMethods.get(0).invoke(obj, parameters);
+        target.setAccessible(true);
+        target.invoke(obj, args);
     }
 
 

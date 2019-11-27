@@ -2,6 +2,7 @@ package cn.justl.fulcrum.vertxboot;
 
 import cn.justl.fulcrum.vertxboot.annotation.VerticleScan;
 import cn.justl.fulcrum.vertxboot.annotationhandler.AnnotationHandler;
+import cn.justl.fulcrum.vertxboot.context.VertxBootContext;
 import cn.justl.fulcrum.vertxboot.excetions.*;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -14,7 +15,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -29,7 +29,7 @@ public class VertxBootStrap extends AbstractVerticle {
 
     private static final ServiceLoader<AnnotationHandler> annotationHandlers = ServiceLoader.load(AnnotationHandler.class);
 
-    public static Future run(Vertx vertx, Class clazz) {
+    public static Future<Void> run(Vertx vertx, Class clazz) {
         return Future.future(promise -> {
             if (isRun) {
                 promise.fail(new VertxBootInitializeException(
@@ -48,6 +48,8 @@ public class VertxBootStrap extends AbstractVerticle {
 
     public static void doRun(Vertx vertx, Class clazz) throws VertxBootException {
         printLogo();
+
+        VertxBootContext.getInstance().setVertx(vertx);
 
         scanVerticle(clazz);
 

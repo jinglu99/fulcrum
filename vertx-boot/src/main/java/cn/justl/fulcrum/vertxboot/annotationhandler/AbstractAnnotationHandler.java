@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertxboot.annotationhandler;
 
-import cn.justl.fulcrum.vertxboot.VertxBootContext;
+import cn.justl.fulcrum.vertxboot.context.VertxBootContext;
 import cn.justl.fulcrum.vertxboot.annotation.PostStart;
 import cn.justl.fulcrum.vertxboot.annotation.PreStart;
 import cn.justl.fulcrum.vertxboot.annotation.VertX;
@@ -14,7 +14,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +40,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
 
         for (Field field : fields) {
             if (field.getAnnotation(VertX.class) == null) continue;
-
+            field.setAccessible(true);
             field.set(obj, VertxBootContext.getInstance().getVertx());
         }
     }
@@ -60,7 +59,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
         if (preStartMethods.size() > 1) {
             throw new VerticleInitializeException("More than one PreStart declared in " + clazz.getName());
         }
-
+        preStartMethods.get(0).setAccessible(true);
         preStartMethods.get(0).invoke(obj);
     }
 
@@ -79,6 +78,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
             throw new VerticleInitializeException("More than one PostStart declared in " + clazz.getName());
         }
 
+        postStartMethods.get(0).setAccessible(true);
         postStartMethods.get(0).invoke(obj);
     }
 
