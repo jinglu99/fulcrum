@@ -1,8 +1,7 @@
 package cn.justl.fulcrum.core;
 
-import cn.justl.fulcrum.vertxboot.VertxBootStrap;
-import cn.justl.fulcrum.vertxboot.annotation.VertX;
-import cn.justl.fulcrum.vertxboot.annotation.VerticleScan;
+import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
+import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 
