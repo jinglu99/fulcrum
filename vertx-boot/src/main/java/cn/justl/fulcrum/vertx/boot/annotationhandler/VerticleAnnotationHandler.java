@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.vertx.boot.annotationhandler;
 
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
-import cn.justl.fulcrum.vertx.boot.context.VertxBootContext;
+import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleInitializeException;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
@@ -46,14 +46,18 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
         return definition;
     }
 
-
     @Override
-    <T> void doStart(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException {
+    <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException {
         try {
-            callStart(verticleDefinition.getClazz(), verticleHolder.getVerticle());
+            callStart(context, verticleDefinition.getClazz(), verticleHolder.getVerticle());
         } catch (Throwable e) {
             throw new VerticleStartException("Failed to execute start option", e);
         }
+    }
+
+    @Override
+    void doClose(Context context, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder) {
+
     }
 
 
@@ -63,7 +67,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     }
 
 
-    private  <T> void callStart(Class<T> clazz, T obj) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+    private <T> void callStart(Context context, Class<T> clazz, T obj) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
         if ((methods = clazz.getDeclaredMethods()) == null) return;
 
@@ -84,7 +88,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
 
         for (int i = 0; i < parameters.length; i++) {
             if (parameters[i].getType().isAssignableFrom(Vertx.class)) {
-                args[i] = VertxBootContext.getInstance().getVertx();
+                args[i] = context.getVertx();
             }
         }
         target.setAccessible(true);

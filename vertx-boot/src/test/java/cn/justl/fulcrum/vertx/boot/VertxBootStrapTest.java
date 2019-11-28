@@ -2,7 +2,6 @@ package cn.justl.fulcrum.vertx.boot;
 
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
 import cn.justl.fulcrum.vertx.boot.context.Context;
-import cn.justl.fulcrum.vertx.boot.context.VertxBootContext;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleInstantiateException;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.TestVerticle1;
@@ -35,7 +34,7 @@ public class VertxBootStrapTest {
     public void basic_VerticleScan_run_test() {
         Future future = VertxBootStrap.run(vertx, this.getClass());
         assertTrue(future.succeeded());
-        Context context = VertxBootContext.getInstance();
+        Context context = VertxBootStrap.getContext();
         assertNotNull(context.getVertx());
         assertTrue(context.listVerticleDefinitions().size() > 0);
         assertTrue(context.listVerticleHolders().size() > 0);
@@ -46,7 +45,7 @@ public class VertxBootStrapTest {
         Future future = VertxBootStrap
             .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap");
         assertTrue(future.succeeded());
-        Context context = VertxBootContext.getInstance();
+        Context context = VertxBootStrap.getContext();
         assertNotNull(context.getVertx());
         assertTrue(context.listVerticleDefinitions().size() > 0);
         assertTrue(context.listVerticleHolders().size() > 0);
@@ -67,7 +66,7 @@ public class VertxBootStrapTest {
         Future future = VertxBootStrap.run(vertx, this.getClass());
         assertTrue(future.succeeded());
 
-        Context context = VertxBootContext.getInstance();
+        Context context = VertxBootStrap.getContext();
         VerticleDefinition definition = context.getVerticleDefinition("testVerticle1");
         assertNotNull(definition);
         assertEquals(TestVerticle1.class, definition.getClazz());

@@ -46,13 +46,18 @@ public class DefaultVertxBootContext implements Context {
     }
 
     @Override
-    public synchronized void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
+    public void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
         if (definitionMap.containsKey(verticleDefinition.getId())) {
             logger.warn("VerticleDefinition {}:{} has been registered, it will by replaced by {}",
                     verticleDefinition.getId(), getVerticleDefinition(verticleDefinition.getId()).getClazz().getName(),
                     verticleDefinition.getClazz().getName());
         }
         definitionMap.put(verticleDefinition.getId(), verticleDefinition);
+    }
+
+    @Override
+    public void unregisterVerticleDefinition(String id) {
+        definitionMap.remove(id);
     }
 
     @Override
@@ -66,12 +71,17 @@ public class DefaultVertxBootContext implements Context {
     }
 
     @Override
-    public synchronized void registerVerticle(VerticleHolder verticleHolder) {
+    public void registerVerticle(VerticleHolder verticleHolder) {
         if (verticles.containsKey(verticleHolder.getId())) {
             logger.warn("Verticle {}:{} has been registered, it will by replaced by {}",
                     verticleHolder.getId(), getVerticleHolder(verticleHolder.getId()).getVerticle(),
                     verticleHolder.getVerticle());
         }
         verticles.put(verticleHolder.getId(), verticleHolder);
+    }
+
+    @Override
+    public void unregisterVerticle(String id) {
+        verticles.remove(id);
     }
 }

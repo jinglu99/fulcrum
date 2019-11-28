@@ -5,13 +5,13 @@ import cn.justl.fulcrum.vertx.boot.annotation.DependOn;
 import cn.justl.fulcrum.vertx.boot.annotation.PostStart;
 import cn.justl.fulcrum.vertx.boot.annotation.PreStart;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
-import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleInitializeException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleInstantiateException;
+import cn.justl.fulcrum.vertx.boot.context.Context;
+import cn.justl.fulcrum.vertx.boot.excetions.*;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
-import cn.justl.fulcrum.vertx.boot.context.VertxBootContext;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleStartException;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Verticle;
+import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
     abstract VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
 
     @Override
-    public <T> VerticleHolder<T> instantiate(VerticleDefinition<T> verticleDefinition) throws VerticleInstantiateException {
+    public <T> VerticleHolder<T> instantiate(Context context, VerticleDefinition<T> verticleDefinition) throws VerticleInstantiateException {
         try {
             VerticleHolder holder = new VerticleHolder(verticleDefinition.getId(), verticleDefinition.getClazz().newInstance());
             holder.setVerticleDefinition(verticleDefinition);
@@ -61,37 +62,89 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
 
 
     @Override
-    public <T> VerticleHolder<T> initialize(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleInitializeException {
+    public <T> VerticleHolder<T> initialize(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleInitializeException {
         try {
-            injectVertx(verticleDefinition, verticleHolder);
+            Verticle trueVerticle = createVerticle(context, verticleDefinition, verticleHolder);
+            AtomicReference<Throwable> throwable = new AtomicReference<>();
+            context.getVertx().deployVerticle(trueVerticle, res -> {
+                if (res.succeeded()) {
+                    verticleHolder.setTrueVerticleId(res.result());
+                    verticleHolder.setTrueVerticle(trueVerticle);
+                    ;
+                } else {
+                    throwable.set(res.cause());
+                }
+            });
 
-            callPreStart(verticleDefinition, verticleHolder);
-
-            doStart(verticleDefinition, verticleHolder);
-
-            callPostStart(verticleDefinition, verticleHolder);
+            if (throwable.get() != null) {
+                throw throwable.get();
+            }
 
             return verticleHolder;
-        } catch (VerticleInitializeException e) {
-            throw e;
         } catch (Throwable e) {
+            if (e instanceof VerticleInitializeException) {
+                throw (VerticleInitializeException) e;
+            }
             logger.info("Failed to initialize Verticle " + verticleDefinition.getClazz().getName(), e);
             throw new VerticleInitializeException("Failed to initialize Verticle " + verticleDefinition.getClazz().getName(), e);
         }
+
     }
 
 
-    abstract <T> void doStart(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException;
+    @Override
+    public <T> void close(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleCloseException {
+        try {
+            AtomicReference<Throwable> throwable = new AtomicReference<>();
+            context.getVertx().undeploy(verticleHolder.getTrueVerticleId(), res -> {
+                if (res.failed()) {
+                    throwable.set(res.cause());
+                }
+            });
+
+            if (throwable.get() != null) {
+                throw throwable.get();
+            }
+        } catch (Throwable throwable) {
+            logger.error("Fail to close the verticle: " + verticleHolder.getId(), throwable);
+            throw new VerticleCloseException("Fail to close the verticle: " + verticleHolder.getId(), throwable);
+        }
+    }
+
+    protected Verticle createVerticle(Context cxt, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder) {
+        return new AbstractVerticle() {
+            @Override
+            public void start() throws Exception {
+                injectVertx(cxt, verticleDefinition, verticleHolder);
+
+                callPreStart(verticleDefinition, verticleHolder);
+
+                doStart(cxt, verticleDefinition, verticleHolder);
+
+                callPostStart(verticleDefinition, verticleHolder);
+            }
+
+            @Override
+            public void stop() throws Exception {
+                doClose(cxt, verticleDefinition, verticleHolder);
+            }
+        };
+    }
 
 
-    protected <T> void injectVertx(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws IllegalAccessException {
+    abstract <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException;
+
+    abstract void doClose(Context context, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder);
+
+
+    protected <T> void injectVertx(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws IllegalAccessException {
         Field[] fields = null;
         if ((fields = verticleDefinition.getClazz().getDeclaredFields()) == null) return;
 
         for (Field field : fields) {
             if (field.getAnnotation(VertX.class) == null) continue;
             field.setAccessible(true);
-            field.set(verticleHolder.getVerticle(), VertxBootContext.getInstance().getVertx());
+            field.set(verticleHolder.getVerticle(), context.getVertx());
         }
     }
 
@@ -138,4 +191,5 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
         definition.setDependOn(dependOn.value());
         return definition;
     }
+
 }

@@ -42,6 +42,8 @@ public interface Context {
      */
     void registerVerticleDefinition(VerticleDefinition verticleDefinition);
 
+    void unregisterVerticleDefinition(String id);
+
     /**
      * Get a {@link VerticleHolder} by given ID.
      * @param id
@@ -62,5 +64,7 @@ public interface Context {
      * @param verticleHolder
      */
     void registerVerticle(VerticleHolder verticleHolder);
+
+    void unregisterVerticle(String id);
 
 }
