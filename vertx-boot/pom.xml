@@ -46,6 +46,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
     <dependency>
       <groupId>org.mockito</groupId>

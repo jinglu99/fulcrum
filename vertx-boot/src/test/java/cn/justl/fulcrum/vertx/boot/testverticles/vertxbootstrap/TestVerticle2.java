@@ -1,23 +1,20 @@
 package cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap;
 
+import cn.justl.fulcrum.vertx.boot.annotation.DependOn;
 import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 
 /**
- * @Date : 2019/11/28
+ * @Date : 2019/11/29
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@Verticle("testVerticle1")
-public class TestVerticle1 {
-
+@Verticle("testVerticle2")
+@DependOn("testVerticle1")
+public class TestVerticle2 {
     @Start
-    public void start() throws InterruptedException {
-        System.out.println("testVerticle1 start...");
+    public void start() {
+        System.out.println("testVerticle2 start...");
         Monitor.initSequence.add(this.getClass());
-    }
-
-    public int test() {
-        return 0;
     }
 }

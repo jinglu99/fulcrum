@@ -8,7 +8,7 @@ import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@Verticle("test")
+@Verticle("test2")
 public class TestVerticle2 {
     @Start
     public void start() {

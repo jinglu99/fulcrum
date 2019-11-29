@@ -10,6 +10,7 @@ public class DefaultVerticleDefinition implements VerticleDefinition {
     private String id;
     private Class clazz;
     private String[] dependOn;
+    private int level = -1;
 
     @Override
     public void setId(String id) {
@@ -39,6 +40,16 @@ public class DefaultVerticleDefinition implements VerticleDefinition {
     @Override
     public String[] getDependOn() {
         return this.dependOn;
+    }
+
+    @Override
+    public void setDeployLevel(int level) {
+        this.level = level;
+    }
+
+    @Override
+    public int getDeployLevel() {
+        return this.level;
     }
 
 }

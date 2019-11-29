@@ -11,7 +11,6 @@ import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,48 +46,21 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
 
     abstract VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
 
+
     @Override
-    public <T> VerticleHolder<T> instantiate(Context context, VerticleDefinition<T> verticleDefinition) throws VerticleInstantiateException {
+    public <T> VerticleHolder<T> create(Context context, VerticleDefinition<T> verticleDefinition)
+        throws VerticleCreationException {
         try {
-            VerticleHolder holder = new VerticleHolder(verticleDefinition.getId(), verticleDefinition.getClazz().newInstance());
+            VerticleHolder holder = new VerticleHolder();
+            holder.setId(verticleDefinition.getId());
+            holder.setVerticle(verticleDefinition.getClazz().newInstance());
             holder.setVerticleDefinition(verticleDefinition);
+            holder.setTrueVerticle(createVerticle(context, verticleDefinition, holder));
             return holder;
         } catch (Throwable e) {
             logger.error("Failed to instantiate Verticle");
-            throw new VerticleInstantiateException("Failed to instantiate Verticle: " + verticleDefinition.getClazz().getName(), e);
+            throw new VerticleCreationException("Failed to instantiate Verticle: " + verticleDefinition.getClazz().getName(), e);
         }
-
-    }
-
-
-    @Override
-    public <T> VerticleHolder<T> initialize(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleInitializeException {
-        try {
-            Verticle trueVerticle = createVerticle(context, verticleDefinition, verticleHolder);
-            AtomicReference<Throwable> throwable = new AtomicReference<>();
-            context.getVertx().deployVerticle(trueVerticle, res -> {
-                if (res.succeeded()) {
-                    verticleHolder.setTrueVerticleId(res.result());
-                    verticleHolder.setTrueVerticle(trueVerticle);
-                    ;
-                } else {
-                    throwable.set(res.cause());
-                }
-            });
-
-            if (throwable.get() != null) {
-                throw throwable.get();
-            }
-
-            return verticleHolder;
-        } catch (Throwable e) {
-            if (e instanceof VerticleInitializeException) {
-                throw (VerticleInitializeException) e;
-            }
-            logger.info("Failed to initialize Verticle " + verticleDefinition.getClazz().getName(), e);
-            throw new VerticleInitializeException("Failed to initialize Verticle " + verticleDefinition.getClazz().getName(), e);
-        }
-
     }
 
 

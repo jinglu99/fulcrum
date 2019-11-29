@@ -1,23 +1,23 @@
-package cn.justl.fulcrum.vertx.boot.context;
+package cn.justl.fulcrum.vertx.boot;
 
-import cn.justl.fulcrum.vertx.boot.VerticleHolder;
+import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
 import io.vertx.core.Vertx;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @Date : 2019/11/24
+ * @Date : 2019/11/29
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class DefaultVertxBootContext implements Context {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultVertxBootContext.class);
+public abstract class AbstractBootStrapContext implements Context, BootStrapHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractBootStrapContext.class);
 
     private Vertx vertx;
 
@@ -49,8 +49,8 @@ public class DefaultVertxBootContext implements Context {
     public void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
         if (definitionMap.containsKey(verticleDefinition.getId())) {
             logger.warn("VerticleDefinition {}:{} has been registered, it will by replaced by {}",
-                    verticleDefinition.getId(), getVerticleDefinition(verticleDefinition.getId()).getClazz().getName(),
-                    verticleDefinition.getClazz().getName());
+                verticleDefinition.getId(), getVerticleDefinition(verticleDefinition.getId()).getClazz().getName(),
+                verticleDefinition.getClazz().getName());
         }
         definitionMap.put(verticleDefinition.getId(), verticleDefinition);
     }
@@ -74,8 +74,8 @@ public class DefaultVertxBootContext implements Context {
     public void registerVerticle(VerticleHolder verticleHolder) {
         if (verticles.containsKey(verticleHolder.getId())) {
             logger.warn("Verticle {}:{} has been registered, it will by replaced by {}",
-                    verticleHolder.getId(), getVerticleHolder(verticleHolder.getId()).getVerticle(),
-                    verticleHolder.getVerticle());
+                verticleHolder.getId(), getVerticleHolder(verticleHolder.getId()).getVerticle(),
+                verticleHolder.getVerticle());
         }
         verticles.put(verticleHolder.getId(), verticleHolder);
     }

@@ -41,4 +41,16 @@ public interface VerticleDefinition<T> {
      */
     String[] getDependOn();
 
+    /**
+     * Set the level of deploy order.
+     * @param level
+     */
+    void setDeployLevel(int level);
+
+    /**
+     * Get the level of deploy order.
+     * @return
+     */
+    int getDeployLevel();
+
 }
