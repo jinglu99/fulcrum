@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.vertx.boot;
 
+import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
@@ -30,66 +31,85 @@ import static org.junit.jupiter.api.Assertions.*;
 @VerticleScan("cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap")
 public class VertxBootStrapTest {
 
-//    private Vertx vertx;
-//    private VertxTestContext testContext;
-
-
-//    @BeforeEach
-//    public void createVertx() {
-//        vertx = Vertx.vertx();
-//        testContext = new VertxTestContext();
-//    }
-
-
     @Test
     public void basic_VerticleScan_run_test(Vertx vertx, VertxTestContext testContext) {
-        Future future = VertxBootStrap.run(vertx, this.getClass());
-        assertTrue(future.succeeded());
-        Context context = VertxBootStrap.getContext();
-        assertNotNull(context.getVertx());
-        assertTrue(context.listVerticleDefinitions().size() > 0);
-        assertTrue(context.listVerticleHolders().size() > 0);
+        VertxBootStrap.run(vertx, this.getClass())
+            .compose(res -> {
+                testContext.verify(() -> {
+                    Context context = VertxBootStrap.getContext();
+                    assertNotNull(context.getVertx());
+                    assertTrue(context.listVerticleDefinitions().size() > 0);
+                    assertTrue(context.listVerticleHolders().size() > 0);
+                }).completeNow();
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
+            testContext.failNow(throwable);
+            return Future.failedFuture(throwable);
+        });
+
     }
 
     @Test
     void basic_package_run_test(Vertx vertx, VertxTestContext testContext) {
-        Future future = VertxBootStrap
-            .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap");
-        assertTrue(future.succeeded());
-        Context context = VertxBootStrap.getContext();
-        assertNotNull(context.getVertx());
-        assertTrue(context.listVerticleDefinitions().size() > 0);
-        assertTrue(context.listVerticleHolders().size() > 0);
+        VertxBootStrap
+            .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap")
+            .compose(res -> {
+                testContext.verify(() -> {
+                    Context context = VertxBootStrap.getContext();
+                    assertNotNull(context.getVertx());
+                    assertTrue(context.listVerticleDefinitions().size() > 0);
+                    assertTrue(context.listVerticleHolders().size() > 0);
+                }).completeNow();
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
+            testContext.failNow(throwable);
+            return Future.failedFuture(throwable);
+        });
+
     }
 
     @Test
     public void circularDependencyTest(Vertx vertx, VertxTestContext testContext) {
-        Future future = VertxBootStrap
-            .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap2");
-        assertTrue(future.failed());
-        assertThrows(VerticleCreationException.class, () -> {
-            throw future.cause();
+        VertxBootStrap
+            .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap2")
+            .compose(res -> {
+                testContext.failNow(null);
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
+            testContext.verify(() -> {
+                assertThrows(VerticleCreationException.class, () -> {
+                    throw throwable;
+                });
+            }).completeNow();
+            return Future.succeededFuture();
         });
     }
 
     @Test
     public void verticleTest(Vertx vertx, VertxTestContext testContext) {
-        Future future = VertxBootStrap.run(vertx, this.getClass());
-        assertTrue(future.succeeded());
-
-        Context context = VertxBootStrap.getContext();
-        VerticleDefinition definition = context.getVerticleDefinition("testVerticle1");
-        assertNotNull(definition);
-        assertEquals(TestVerticle1.class, definition.getClazz());
-        VerticleHolder verticleHolder = context.getVerticleHolder("testVerticle1");
-        assertNotNull(verticleHolder);
-        assertNotNull(verticleHolder.getVerticle());
-        assertEquals(definition, verticleHolder.getVerticleDefinition());
+        VertxBootStrap.run(vertx, this.getClass())
+            .compose(res -> {
+                testContext.verify(() -> {
+                    Context context = VertxBootStrap.getContext();
+                    VerticleDefinition definition = context.getVerticleDefinition("testVerticle1");
+                    assertNotNull(definition);
+                    assertEquals(TestVerticle1.class, definition.getClazz());
+                    VerticleHolder verticleHolder = context.getVerticleHolder("testVerticle1");
+                    assertNotNull(verticleHolder);
+                    assertNotNull(verticleHolder.getVerticle());
+                    assertEquals(definition, verticleHolder.getVerticleDefinition());
+                }).completeNow();
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
+                testContext.failNow(throwable);
+                return Future.failedFuture(throwable);
+        });
     }
 
     @Test
     @Timeout(timeUnit = TimeUnit.SECONDS, value = 20)
-    public void dependOnTest(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
+    public void dependOnTest(Vertx vertx, VertxTestContext testContext)
+        throws InterruptedException {
         VertxBootStrap.run(vertx, this.getClass())
             .compose(res -> {
                 testContext.verify(() -> {
@@ -100,12 +120,14 @@ public class VertxBootStrapTest {
                 });
                 return Future.succeededFuture();
             }).otherwise(throwable -> {
-                testContext.failNow(throwable);
-                return Future.failedFuture(throwable);
-            });
+            testContext.failNow(throwable);
+            return Future.failedFuture(throwable);
+        });
 
 
     }
+
+
 
 
 }

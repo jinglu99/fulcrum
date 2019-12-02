@@ -6,12 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Date : 2019/11/23
+ * @Date : 2019/12/2
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Verticle {
+public @interface WebVerticle {
     String value() default "";
 }

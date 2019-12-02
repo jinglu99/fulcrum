@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot.annotationhandler;
+package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.context.Context;
@@ -22,6 +22,6 @@ public interface AnnotationHandler {
 
     <T> void close(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleCloseException;
 
-    boolean satisfied(Class clazz);
+    boolean isTargetVerticle(Class clazz);
 
 }

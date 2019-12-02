@@ -2,13 +2,12 @@ package cn.justl.fulcrum.vertx.boot.context;
 
 import cn.justl.fulcrum.vertx.boot.AbstractBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
-import cn.justl.fulcrum.vertx.boot.annotationhandler.AnnotationHandler;
+import cn.justl.fulcrum.vertx.boot.annotation.handler.AnnotationHandler;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.*;
 import io.vertx.core.Promise;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -109,6 +108,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                         .deployVerticle(getVerticleHolder(definition.getId()).getTrueVerticle(),
                             res -> {
                                 if (res.succeeded()) {
+                                    getVerticleHolder(definition.getId()).setTrueVerticleId(res.result());
                                     latch.countDown();
                                 } else {
                                     p.fail(res.cause());
@@ -140,7 +140,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                 Iterator iterator = annotationHandlers.iterator();
                 while (iterator.hasNext()) {
                     AnnotationHandler handler = (AnnotationHandler) iterator.next();
-                    if (handler.satisfied(holder.getVerticleDefinition().getClazz())) {
+                    if (handler.isTargetVerticle(holder.getVerticleDefinition().getClazz())) {
                         handler.close(this, holder.getVerticleDefinition(), holder);
                         unregisterVerticle(holder.getId());
                         unregisterVerticleDefinition(holder.getId());
@@ -199,7 +199,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         Iterator iterator = annotationHandlers.iterator();
         while (iterator.hasNext()) {
             AnnotationHandler handler = (AnnotationHandler) iterator.next();
-            if (handler.satisfied(verticleDefinition.getClazz())) {
+            if (handler.isTargetVerticle(verticleDefinition.getClazz())) {
                 VerticleHolder holder = handler.create(this, verticleDefinition);
                 registerVerticle(holder);
                 logger.info("register verticle {}", holder.getId());

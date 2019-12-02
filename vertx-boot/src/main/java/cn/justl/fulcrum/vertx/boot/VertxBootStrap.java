@@ -25,7 +25,7 @@ public class VertxBootStrap {
 
     private static BootStrapHandler handler;
 
-    public static Future<Void> run(Vertx vertx, Class clazz) {
+    public static synchronized Future<Void> run(Vertx vertx, Class clazz) {
         return Future.future(promise -> {
             try {
                 if (handler != null) {
@@ -45,7 +45,7 @@ public class VertxBootStrap {
         });
     }
 
-    public static Future<Void> run(Vertx vertx, String packages) {
+    public static synchronized Future<Void> run(Vertx vertx, String packages) {
         return Future.future(promise -> {
             try {
                 if (handler != null) {

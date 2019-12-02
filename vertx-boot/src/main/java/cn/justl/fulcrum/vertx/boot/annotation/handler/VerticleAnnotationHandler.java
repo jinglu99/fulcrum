@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot.annotationhandler;
+package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.context.Context;
@@ -30,7 +30,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
 
 
     @Override
-    boolean isTargetVerticle(Class clazz) {
+    public boolean isTargetVerticle(Class clazz) {
         return clazz.getDeclaredAnnotation(Verticle.class) != null;
     }
 
@@ -58,12 +58,6 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     @Override
     void doClose(Context context, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder) {
 
-    }
-
-
-    @Override
-    public boolean satisfied(Class clazz) {
-        return clazz.getDeclaredAnnotation(Verticle.class) != null;
     }
 
 

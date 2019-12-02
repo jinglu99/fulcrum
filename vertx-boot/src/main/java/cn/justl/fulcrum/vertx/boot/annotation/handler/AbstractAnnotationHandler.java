@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot.annotationhandler;
+package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.ClassHelper;
 import cn.justl.fulcrum.vertx.boot.annotation.DependOn;
@@ -41,8 +41,6 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
         }
         return definitions;
     }
-
-    abstract boolean isTargetVerticle(Class clazz);
 
     abstract VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
 
