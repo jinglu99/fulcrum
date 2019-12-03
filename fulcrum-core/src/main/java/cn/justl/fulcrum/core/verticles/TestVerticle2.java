@@ -6,6 +6,7 @@ import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.annotation.WebVerticle;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * @Date : 2019-11-28
@@ -20,7 +21,7 @@ public class TestVerticle2 {
     }
 
     @HttpRouter("/")
-    public void test(HttpServerRequest req) {
-        req.response().end("ok");
+    public void test(RoutingContext context) {
+        context.response().end("ok");
     }
 }

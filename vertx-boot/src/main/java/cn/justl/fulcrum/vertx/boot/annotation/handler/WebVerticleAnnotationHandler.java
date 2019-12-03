@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Date : 2019/12/2
@@ -25,6 +27,8 @@ import java.util.stream.Stream;
  * @Desc : An implementation of {@link AnnotationHandler} to handle {@link WebVerticle} annotation.
  */
 public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebVerticleAnnotationHandler.class);
 
     @Override
     VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
@@ -51,11 +55,12 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler {
             .map(handler -> {
                 HttpRouter httpRouter = handler.getDeclaredAnnotation(HttpRouter.class);
                 RouterHandler rh = new RouterHandler();
+                handler.setAccessible(true);
                 rh.setHandler(handler);
                 rh.setPath(httpRouter.value());
                 rh.setMethod(httpRouter.method());
                 rh.setPort(httpRouter.port() > 0 ? httpRouter.port()
-                    : rootRoute.port() > 0 ? rootRoute.port() : WebConstants.DEFAULT_HTTP_PORT);
+                    : rootRoute != null && rootRoute.port() > 0 ? rootRoute.port() : WebConstants.DEFAULT_HTTP_PORT);
 
                 return rh;
             }).collect(Collectors.groupingBy(RouterHandler::getPort))
@@ -65,7 +70,7 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler {
                 List<RouterHandler> handlers = routerHandlers.getValue();
 
                 Router subRouter = Router.router(context.getVertx());
-                handlers.forEach(handler->{
+                handlers.forEach(handler -> {
                     subRouter.route(handler.path)
                         .method(handler.method)
                         .handler(req -> {
@@ -79,12 +84,16 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler {
                                 throw new RuntimeException(e.getCause());
                             }
                         });
+                    String path = handler.path.replace("//", "/");
+                    if (rootRoute != null) {
+                        path = (rootRoute.value() + "/" + handler.path).replace("//", "/");
+                    }
+                    logger.info("http service {} mounted at port {}", path, routerHandlers.getKey());
                 });
 
                 Router router = subRouter;
                 if (rootRoute != null && !rootRoute.value().equals("/")) {
-                    router = Router.router(context.getVertx())
-                        .mountSubRouter(rootRoute.value(), subRouter);
+                    router = Router.router(context.getVertx()).mountSubRouter(rootRoute.value(), subRouter);
                 }
 
                 context.getVertx()

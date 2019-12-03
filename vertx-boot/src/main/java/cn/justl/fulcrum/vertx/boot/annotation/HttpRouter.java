@@ -3,6 +3,8 @@ package cn.justl.fulcrum.vertx.boot.annotation;
 import cn.justl.fulcrum.vertx.boot.web.WebConstants;
 import io.vertx.core.http.HttpMethod;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
@@ -11,6 +13,7 @@ import java.lang.annotation.Target;
  * @Desc :
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface HttpRouter {
     String value() default "/";
     HttpMethod method() default HttpMethod.GET;
