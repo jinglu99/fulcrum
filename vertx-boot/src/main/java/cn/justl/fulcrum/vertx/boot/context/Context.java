@@ -11,34 +11,29 @@ import java.util.List;
  * @Desc :
  */
 public interface Context {
+
     /**
      * get the {@link Vertx} Object.
-     * @return
      */
     Vertx getVertx();
 
     /**
      * set a {@link Vertx} Object.
-     * @param vertx
      */
     void setVertx(Vertx vertx);
 
     /**
      * Get a {@link VerticleDefinition} by given ID.
-     * @param id
-     * @return
      */
     VerticleDefinition getVerticleDefinition(String id);
 
     /**
      * List all {@link VerticleDefinition} registered in Context.
-     * @return
      */
     List<VerticleDefinition> listVerticleDefinitions();
 
     /**
      * register a {@link VerticleDefinition} in Context.
-     * @param verticleDefinition
      */
     void registerVerticleDefinition(VerticleDefinition verticleDefinition);
 
@@ -46,22 +41,16 @@ public interface Context {
 
     /**
      * Get a {@link VerticleHolder} by given ID.
-     * @param id
-     * @return
      */
     VerticleHolder getVerticleHolder(String id);
 
-
     /**
      * List all {@link VerticleHolder} registerd in Context.
-     * @return
      */
     List<VerticleHolder> listVerticleHolders();
 
-
     /**
      * Register a {@link VerticleHolder} in Context.
-     * @param verticleHolder
      */
     void registerVerticle(VerticleHolder verticleHolder);
 

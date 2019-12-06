@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc : An implementation of {@link AnnotationHandler} to handle {@link WebVerticle} annotation.
  */
-public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler {
+public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler implements VerticleParsable {
 
     private static final Logger logger = LoggerFactory.getLogger(WebVerticleAnnotationHandler.class);
 
     @Override
-    VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
+    public VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
         WebVerticle verticle = (WebVerticle) clazz.getDeclaredAnnotation(WebVerticle.class);
         VerticleDefinition definition = new DefaultVerticleDefinition();
         String id =

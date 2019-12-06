@@ -3,6 +3,7 @@ package cn.justl.fulcrum.vertx.boot.context;
 import cn.justl.fulcrum.vertx.boot.AbstractBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.handler.AnnotationHandler;
+import cn.justl.fulcrum.vertx.boot.annotation.handler.VerticleParsable;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.*;
 import io.vertx.core.Promise;
@@ -35,10 +36,6 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
 
     private final Set<VerticleDefinition> instantiatedDefinitions = new HashSet<>();
 
-    private final Set<VerticleHolder> initializingVerticles = new HashSet<>();
-
-    private final Set<VerticleHolder> initializedVerticles = new HashSet<>();
-
     private final List<List<VerticleDefinition>> deployOrderLevel = new ArrayList<>();
 
     private final Promise initPromise;
@@ -65,6 +62,22 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                 }
             }
         });
+    }
+
+    @Override
+    public void scanVerticles(Class[] classes) throws VertxBootException {
+        if (classes == null || classes.length == 0) {
+            logger.warn("No verticles provided!");
+        }
+
+        for (Class clazz : classes) {
+            for (AnnotationHandler handler : annotationHandlers) {
+                if (handler.isTargetVerticle(clazz)) {
+                    registerVerticleDefinition(((VerticleParsable)handler).parseVerticle(clazz));
+                    break;
+                }
+            }
+        }
     }
 
     @Override

@@ -17,6 +17,8 @@ public interface BootStrapHandler {
 
     void scanVerticles(String[] packages) throws VertxBootException;
 
+    void scanVerticles(Class[] classes) throws VertxBootException;
+
     void instantiateVerticles() throws VertxBootException;
 
     void initializeVerticles() throws VertxBootException;

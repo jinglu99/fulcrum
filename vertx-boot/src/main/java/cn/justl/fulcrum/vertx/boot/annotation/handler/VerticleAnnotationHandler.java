@@ -25,7 +25,9 @@ import java.util.stream.Collectors;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
+public class VerticleAnnotationHandler extends AbstractAnnotationHandler implements
+    VerticleParsable {
+
     private static final Logger logger = LoggerFactory.getLogger(VerticleAnnotationHandler.class);
 
 
@@ -35,11 +37,13 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     }
 
     @Override
-    VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
+    public VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
         Verticle verticle = (Verticle) clazz.getAnnotation(Verticle.class);
         VerticleDefinition definition = new DefaultVerticleDefinition();
 
-        String id = verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase() + clazz.getSimpleName().substring(1) : verticle.value();
+        String id =
+            verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase()
+                + clazz.getSimpleName().substring(1) : verticle.value();
         definition.setId(id);
         definition.setClazz(clazz);
 
@@ -47,7 +51,8 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     }
 
     @Override
-    <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException {
+    <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder) throws VerticleStartException {
         try {
             callStart(context, verticleDefinition.getClazz(), verticleHolder.getVerticle());
         } catch (Throwable e) {
@@ -56,24 +61,30 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler {
     }
 
     @Override
-    void doClose(Context context, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder) {
+    void doClose(Context context, VerticleDefinition verticleDefinition,
+        VerticleHolder verticleHolder) {
 
     }
 
 
-    private <T> void callStart(Context context, Class<T> clazz, T obj) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+    private <T> void callStart(Context context, Class<T> clazz, T obj)
+        throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
-        if ((methods = clazz.getDeclaredMethods()) == null) return;
-
+        if ((methods = clazz.getDeclaredMethods()) == null) {
+            return;
+        }
 
         List<Method> preStartMethods = Arrays.asList(methods)
-                .stream()
-                .filter(method -> method.getAnnotation(Start.class) != null)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(method -> method.getAnnotation(Start.class) != null)
+            .collect(Collectors.toList());
 
-        if (preStartMethods.size() == 0) return;
+        if (preStartMethods.size() == 0) {
+            return;
+        }
         if (preStartMethods.size() > 1) {
-            throw new VerticleInitializeException("More than one PreStart declared in " + clazz.getName());
+            throw new VerticleInitializeException(
+                "More than one PreStart declared in " + clazz.getName());
         }
 
         Method target = preStartMethods.get(0);

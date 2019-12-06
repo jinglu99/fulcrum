@@ -4,8 +4,11 @@ import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.context.DefaultBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
+import io.netty.bootstrap.BootstrapConfig;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * @Date : 2019/11/23
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
- * @Desc :
+ * @Desc : Vertx-Boot start here.
  */
 public class VertxBootStrap {
 
@@ -25,19 +28,18 @@ public class VertxBootStrap {
 
     private static BootStrapHandler handler;
 
+    /**
+     * Initialize Vertx-Boot with given {@link VerticleScan} annotated class.
+     */
     public static synchronized Future<Void> run(Vertx vertx, Class clazz) {
         return Future.future(promise -> {
             try {
-                if (handler != null) {
-                    logger.warn(
-                        "VertxBootStrap.run() has been called, a new context will be created and the old one will be closed!");
-                    handler.close();
-                }
-                handler = new DefaultBootStrapContext(promise);
-
-                logger.info("start initializing VertX-Boot...");
-                doRunVerticleScan(vertx, clazz);
-                logger.info("Initializing VertX-Boot successfully");
+                BootStrapConfig config = new BootStrapConfig();
+                config.setPromise(promise);
+                config.setVertx(vertx);
+                config.setVerticleScanClazz(clazz);
+                config.setVerticleScanClazzRequired(true);
+                doRun(config);
             } catch (Throwable e) {
                 logger.error("VertX-Boot initializing failed", e);
                 promise.fail(e);
@@ -45,19 +47,37 @@ public class VertxBootStrap {
         });
     }
 
+    /**
+     * Initialize Vertx-Boot with given packages.
+     */
     public static synchronized Future<Void> run(Vertx vertx, String packages) {
         return Future.future(promise -> {
             try {
-                if (handler != null) {
-                    logger.warn(
-                        "VertxBootStrap.run() has been called, a new context will be created and the old one will be closed!");
-                    handler.close();
-                }
-                handler = new DefaultBootStrapContext(promise);
+                BootStrapConfig config = new BootStrapConfig();
+                config.setPromise(promise);
+                config.setVertx(vertx);
+                config.setPackages(packages.split(","));
+                config.setPackagesRequired(true);
+                doRun(config);
+            } catch (Throwable e) {
+                logger.error("VertX-Boot initializing failed", e);
+                promise.fail(e);
+            }
+        });
+    }
 
-                logger.info("start initializing VertX-Boot...");
-                doRunPackages(vertx, packages.split(","));
-                logger.info("Initializing VertX-Boot successfully");
+    /**
+     * Initialize Vertx-Boot with given Verticle classes.
+     */
+    public static synchronized Future<Void> runWithVerticles(Vertx vertx, Class... verticles) {
+        return Future.future(promise -> {
+            try {
+                BootStrapConfig config = new BootStrapConfig();
+                config.setPromise(promise);
+                config.setVertx(vertx);
+                config.setVerticles(verticles);
+                config.setVerticlesRequired(true);
+                doRun(config);
             } catch (Throwable e) {
                 logger.error("VertX-Boot initializing failed", e);
                 promise.fail(e);
@@ -80,34 +100,6 @@ public class VertxBootStrap {
         });
     }
 
-    private static void doRunVerticleScan(Vertx vertx, Class clazz) throws VertxBootException {
-        VerticleScan verticleScan = (VerticleScan) clazz.getAnnotation(VerticleScan.class);
-
-        if (verticleScan == null) {
-            throw new VertxBootException(
-                "VerticleScan annotation not found or no package declared in VerticleScan in class "
-                    + clazz.getName());
-        }
-
-        String[] packages =
-            verticleScan.value().length == 0 ? new String[]{clazz.getPackage().getName()}
-                : verticleScan.value();
-
-        doRunPackages(vertx, packages);
-    }
-
-    private static void doRunPackages(Vertx vertx, String[] packages) throws VertxBootException {
-        printLogo();
-
-        handler.setVertx(vertx);
-
-        handler.scanVerticles(packages);
-
-        handler.instantiateVerticles();
-
-        handler.initializeVerticles();
-    }
-
     public static Context getContext() {
         if (handler == null) {
             return null;
@@ -116,9 +108,175 @@ public class VertxBootStrap {
         }
     }
 
+    private static void checkHandler(Promise promise) throws VertxBootException {
+        if (handler != null) {
+            logger.warn(
+                "VertxBootStrap.run() has been called, a new context will be created and the old one will be closed!");
+            handler.close();
+        }
+        handler = new DefaultBootStrapContext(promise);
+    }
+
+    private static void scanVerticles(BootStrapConfig config) throws VertxBootException {
+        scanByVerticleScanIfNeeded(config);
+
+        scanByGivenPackagesIfNeeded(config);
+
+        scanByGivenVerticles(config);
+    }
+
+    private static void scanByVerticleScanIfNeeded(BootStrapConfig config)
+        throws VertxBootException {
+        Class clazz;
+        if ((clazz = config.getVerticleScanClazz()) != null) {
+            VerticleScan verticleScan = (VerticleScan) clazz.getAnnotation(VerticleScan.class);
+            String[] packages =
+                verticleScan.value().length == 0 ? new String[]{clazz.getPackage().getName()}
+                    : verticleScan.value();
+            handler.scanVerticles(packages);
+        } else if (clazz == null && config.isVerticleScanClazzRequired()) {
+            logger.error(
+                "VerticleScan annotation not found or no package declared in VerticleScan in class "
+                    + clazz.getName());
+            throw new VertxBootException(
+                "VerticleScan annotation not found or no package declared in VerticleScan in class "
+                    + clazz.getName());
+
+        }
+    }
+
+    private static void scanByGivenPackagesIfNeeded(BootStrapConfig config)
+        throws VertxBootException {
+        String[] packages;
+        if ((packages = config.getPackages()) != null && packages.length != 0) {
+            handler.scanVerticles(packages);
+        } else if (config.isPackagesRequired()) {
+            logger.error("Packages not provided for Vertx-Boot!");
+            throw new VertxBootException("packages not provided for Vertx-Boot!");
+        }
+    }
+
+    private static void scanByGivenVerticles(BootStrapConfig config) throws VertxBootException {
+        Class[] classes;
+        if ((classes = config.getVerticles()) != null && classes.length > 0) {
+            handler.scanVerticles(classes);
+        } else if (config.isVerticlesRequired()) {
+            logger.error("Verticles not provided for Vertx-Boot!");
+            throw new VertxBootException("Verticles not provided for Vertx-Boot!");
+        }
+    }
+
+    private static void doRun(BootStrapConfig config) throws VertxBootException {
+        printLogo();
+
+        checkHandler(config.getPromise());
+
+        handler.setVertx(config.getVertx());
+
+        scanVerticles(config);
+
+        handler.instantiateVerticles();
+
+        handler.initializeVerticles();
+    }
+
     private static void printLogo() {
         InputStream in = ClassHelper.getClassLoader().getResourceAsStream(Constants.LOGO_PATH);
         System.out.println(new BufferedReader(new InputStreamReader(in))
             .lines().collect(Collectors.joining(System.lineSeparator())));
+    }
+
+    private static class BootStrapConfig {
+
+        private Vertx vertx;
+
+        private Class VerticleScanClazz;
+        private boolean VerticleScanClazzRequired;
+
+        private String[] packages;
+        private boolean packagesRequired;
+
+        private Class[] verticles;
+        private boolean verticlesRequired;
+
+        private Promise promise;
+
+
+        public Vertx getVertx() {
+            return vertx;
+        }
+
+        public void setVertx(Vertx vertx) {
+            this.vertx = vertx;
+        }
+
+        public Class getVerticleScanClazz() {
+            return VerticleScanClazz;
+        }
+
+        public void setVerticleScanClazz(Class verticleScanClazz) {
+            VerticleScanClazz = verticleScanClazz;
+        }
+
+        public boolean isVerticleScanClazzRequired() {
+            return VerticleScanClazzRequired;
+        }
+
+        public void setVerticleScanClazzRequired(boolean verticleScanClazzRequired) {
+            VerticleScanClazzRequired = verticleScanClazzRequired;
+        }
+
+        public String[] getPackages() {
+            return packages;
+        }
+
+        public void setPackages(String[] packages) {
+            this.packages = packages;
+        }
+
+        public boolean isPackagesRequired() {
+            return packagesRequired;
+        }
+
+        public void setPackagesRequired(boolean packagesRequired) {
+            this.packagesRequired = packagesRequired;
+        }
+
+        public Class[] getVerticles() {
+            return verticles;
+        }
+
+        public void setVerticles(Class[] verticles) {
+            this.verticles = verticles;
+        }
+
+        public boolean isVerticlesRequired() {
+            return verticlesRequired;
+        }
+
+        public void setVerticlesRequired(boolean verticlesRequired) {
+            this.verticlesRequired = verticlesRequired;
+        }
+
+        public Promise getPromise() {
+            return promise;
+        }
+
+        public void setPromise(Promise promise) {
+            this.promise = promise;
+        }
+
+        @Override
+        public String toString() {
+            return "BootStrapConfig{" +
+                "vertx=" + vertx +
+                ", VerticleScanClazz=" + VerticleScanClazz +
+                ", VerticleScanClazzRequired=" + VerticleScanClazzRequired +
+                ", packages=" + Arrays.toString(packages) +
+                ", packagesRequired=" + packagesRequired +
+                ", verticles=" + Arrays.toString(verticles) +
+                ", verticlesRequired=" + verticlesRequired +
+                '}';
+        }
     }
 }

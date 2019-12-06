@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.vertx.boot;
 
+import java.io.InputStream;
 import java.util.Optional;
 
 /**
@@ -8,6 +9,10 @@ import java.util.Optional;
  * @Desc :
  */
 public class VertxBootProperty {
+    public VertxBootProperty(String path) {
+
+    }
+
     public String getProperty(String key) {
         return null;
     }

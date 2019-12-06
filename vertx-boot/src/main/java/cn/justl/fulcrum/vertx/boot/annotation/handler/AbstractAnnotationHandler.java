@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public abstract class AbstractAnnotationHandler implements AnnotationHandler {
+public abstract class AbstractAnnotationHandler implements AnnotationHandler, VerticleParsable {
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractAnnotationHandler.class);
 
 
@@ -41,8 +42,6 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
         }
         return definitions;
     }
-
-    abstract VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
 
 
     @Override
@@ -57,13 +56,15 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
             return holder;
         } catch (Throwable e) {
             logger.error("Failed to instantiate Verticle");
-            throw new VerticleCreationException("Failed to instantiate Verticle: " + verticleDefinition.getClazz().getName(), e);
+            throw new VerticleCreationException(
+                "Failed to instantiate Verticle: " + verticleDefinition.getClazz().getName(), e);
         }
     }
 
 
     @Override
-    public <T> void close(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleCloseException {
+    public <T> void close(Context context, VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder) throws VerticleCloseException {
         try {
             AtomicReference<Throwable> throwable = new AtomicReference<>();
             context.getVertx().undeploy(verticleHolder.getTrueVerticleId(), res -> {
@@ -77,11 +78,13 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
             }
         } catch (Throwable throwable) {
             logger.error("Fail to close the verticle: " + verticleHolder.getId(), throwable);
-            throw new VerticleCloseException("Fail to close the verticle: " + verticleHolder.getId(), throwable);
+            throw new VerticleCloseException(
+                "Fail to close the verticle: " + verticleHolder.getId(), throwable);
         }
     }
 
-    protected Verticle createVerticle(Context cxt, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder) {
+    protected Verticle createVerticle(Context cxt, VerticleDefinition verticleDefinition,
+        VerticleHolder verticleHolder) {
         return new AbstractVerticle() {
             @Override
             public void start() throws Exception {
@@ -102,53 +105,72 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
     }
 
 
-    abstract <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleStartException;
+    abstract <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder) throws VerticleStartException;
 
-    abstract void doClose(Context context, VerticleDefinition verticleDefinition, VerticleHolder verticleHolder);
+    abstract void doClose(Context context, VerticleDefinition verticleDefinition,
+        VerticleHolder verticleHolder);
 
 
-    protected <T> void injectVertx(Context context, VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws IllegalAccessException {
+    protected <T> void injectVertx(Context context, VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder) throws IllegalAccessException {
         Field[] fields = null;
-        if ((fields = verticleDefinition.getClazz().getDeclaredFields()) == null) return;
+        if ((fields = verticleDefinition.getClazz().getDeclaredFields()) == null) {
+            return;
+        }
 
         for (Field field : fields) {
-            if (field.getAnnotation(VertX.class) == null) continue;
+            if (field.getAnnotation(VertX.class) == null) {
+                continue;
+            }
             field.setAccessible(true);
             field.set(verticleHolder.getVerticle(), context.getVertx());
         }
     }
 
-    protected <T> void callPreStart(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+    protected <T> void callPreStart(VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder)
+        throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
-        if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) return;
-
+        if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) {
+            return;
+        }
 
         List<Method> preStartMethods = Arrays.asList(methods)
-                .stream()
-                .filter(method -> method.getAnnotation(PreStart.class) != null)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(method -> method.getAnnotation(PreStart.class) != null)
+            .collect(Collectors.toList());
 
-        if (preStartMethods.size() == 0) return;
+        if (preStartMethods.size() == 0) {
+            return;
+        }
         if (preStartMethods.size() > 1) {
-            throw new VerticleInitializeException("More than one PreStart declared in " + verticleDefinition.getClazz().getName());
+            throw new VerticleInitializeException(
+                "More than one PreStart declared in " + verticleDefinition.getClazz().getName());
         }
         preStartMethods.get(0).setAccessible(true);
         preStartMethods.get(0).invoke(verticleHolder.getVerticle());
     }
 
-    protected <T> void callPostStart(VerticleDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleInitializeException, InvocationTargetException, IllegalAccessException {
+    protected <T> void callPostStart(VerticleDefinition<T> verticleDefinition,
+        VerticleHolder<T> verticleHolder)
+        throws VerticleInitializeException, InvocationTargetException, IllegalAccessException {
         Method[] methods = null;
-        if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) return;
-
+        if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) {
+            return;
+        }
 
         List<Method> postStartMethods = Arrays.asList(methods)
-                .stream()
-                .filter(method -> method.getAnnotation(PostStart.class) != null)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(method -> method.getAnnotation(PostStart.class) != null)
+            .collect(Collectors.toList());
 
-        if (postStartMethods.size() == 0) return;
+        if (postStartMethods.size() == 0) {
+            return;
+        }
         if (postStartMethods.size() > 1) {
-            throw new VerticleInitializeException("More than one PostStart declared in " + verticleDefinition.getClazz().getName());
+            throw new VerticleInitializeException(
+                "More than one PostStart declared in " + verticleDefinition.getClazz().getName());
         }
 
         postStartMethods.get(0).setAccessible(true);
@@ -157,7 +179,9 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler {
 
     protected VerticleDefinition setDependent(VerticleDefinition definition) {
         DependOn dependOn = (DependOn) definition.getClazz().getAnnotation(DependOn.class);
-        if (dependOn == null || dependOn.value().length == 0) return definition;
+        if (dependOn == null || dependOn.value().length == 0) {
+            return definition;
+        }
         definition.setDependOn(dependOn.value());
         return definition;
     }
