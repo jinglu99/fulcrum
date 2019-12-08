@@ -36,6 +36,7 @@ public class JDBCTest extends DBTest {
 
         System.out
             .println(((PreparedStatement) ps).getParameterMetaData().getParameterClassName(3));
+        while (true);
 
     }
 

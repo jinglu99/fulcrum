@@ -55,6 +55,21 @@
       <artifactId>vertx-junit5</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/ch.vorburger.mariaDB4j/mariaDB4j -->
+    <dependency>
+      <groupId>ch.vorburger.mariaDB4j</groupId>
+      <artifactId>mariaDB4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>

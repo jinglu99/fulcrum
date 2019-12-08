@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.justl.fulcrum.common.modal.QueryRequest;
 import cn.justl.fulcrum.common.modal.codec.QueryRequestMessageCodec;
+import cn.justl.fulcrum.core.db.DBTest;
 import cn.justl.fulcrum.core.verticles.QueryService;
 import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
@@ -15,9 +16,16 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.stream.Stream;
 
 /**
  * @Date : 2019/12/6
@@ -27,7 +35,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @DisplayName("Test for QueryService")
 @ExtendWith(VertxExtension.class)
 @VerticleScan
-public class QueryServiceTest {
+public class QueryServiceTest extends DBTest {
+    private static final String  Test_Path = "/";
+
+    @BeforeEach
+    public void init() throws SQLException, IOException, ClassNotFoundException {
+        initDB();
+//        prepareData("/db/QueryService.sql");
+    }
+
+    @Test
+    public void dbTest() throws SQLException, ClassNotFoundException {
+        System.out.println(executeSql("select * from fulcrum_info"));
+    }
+
+
 
     @Test
     public void test(Vertx vertx, VertxTestContext testContext) {
