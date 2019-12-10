@@ -7,4 +7,6 @@ package cn.justl.fulcrum.vertx.boot;
  */
 public class Constants {
     public static final String LOGO_PATH = "logo";
+
+    public static final String DEFAULT_PROPERTIES_FILE = "vertxBoot.properties";
 }

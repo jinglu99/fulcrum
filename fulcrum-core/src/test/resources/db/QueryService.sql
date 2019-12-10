@@ -1,2 +1,3 @@
-INSERT INTO test1 (id,username, password, email, bio, favourite_section) VALUES (101,'jim','********','jim@ibatis.apache.org','','NEWS');
-INSERT INTO test1 (id,username, password, email, bio, favourite_section) VALUES (102,'sally','********','sally@ibatis.apache.org',null,'VIDEOS');
+insert into fulcrum_resource(resource_id,dynamic_sql) values ('test1', 'select * from table');
+insert into fulcrum_resource(resource_id,dynamic_sql) values ('test2', 'select * from table');
+insert into fulcrum_resource(resource_id,dynamic_sql) values ('test3', 'select * from table');

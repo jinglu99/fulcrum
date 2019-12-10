@@ -141,6 +141,7 @@ public class ScriptRunner {
       checkForMissingLineTerminator(command);
     } catch (Exception e) {
       String message = "Error executing: " + command + ".  Cause: " + e;
+      System.out.println(message);
       printlnError(message);
       throw new RuntimeException(message, e);
     }

@@ -32,11 +32,16 @@ public class VertxBootStrap {
      * Initialize Vertx-Boot with given {@link VerticleScan} annotated class.
      */
     public static synchronized Future<Void> run(Vertx vertx, Class clazz) {
+        return run(vertx, new InitProps(), clazz);
+    }
+
+    public static synchronized Future<Void> run(Vertx vertx, InitProps props, Class clazz) {
         return Future.future(promise -> {
             try {
                 BootStrapConfig config = new BootStrapConfig();
                 config.setPromise(promise);
                 config.setVertx(vertx);
+                config.setProps(props);
                 config.setVerticleScanClazz(clazz);
                 config.setVerticleScanClazzRequired(true);
                 doRun(config);
@@ -51,11 +56,16 @@ public class VertxBootStrap {
      * Initialize Vertx-Boot with given packages.
      */
     public static synchronized Future<Void> run(Vertx vertx, String packages) {
+        return run(vertx, new InitProps(), packages);
+    }
+
+    public static synchronized Future<Void> run(Vertx vertx, InitProps props, String packages) {
         return Future.future(promise -> {
             try {
                 BootStrapConfig config = new BootStrapConfig();
                 config.setPromise(promise);
                 config.setVertx(vertx);
+                config.setProps(props);
                 config.setPackages(packages.split(","));
                 config.setPackagesRequired(true);
                 doRun(config);
@@ -70,11 +80,16 @@ public class VertxBootStrap {
      * Initialize Vertx-Boot with given Verticle classes.
      */
     public static synchronized Future<Void> runWithVerticles(Vertx vertx, Class... verticles) {
+        return runWithVerticles(vertx, new InitProps(), verticles);
+    }
+
+    public static synchronized Future<Void> runWithVerticles(Vertx vertx, InitProps props, Class... verticles) {
         return Future.future(promise -> {
             try {
                 BootStrapConfig config = new BootStrapConfig();
                 config.setPromise(promise);
                 config.setVertx(vertx);
+                config.setProps(props);
                 config.setVerticles(verticles);
                 config.setVerticlesRequired(true);
                 doRun(config);
@@ -171,6 +186,8 @@ public class VertxBootStrap {
 
         checkHandler(config.getPromise());
 
+        handler.loadProperties(config.props.getProperties());
+
         handler.setVertx(config.getVertx());
 
         scanVerticles(config);
@@ -189,6 +206,7 @@ public class VertxBootStrap {
     private static class BootStrapConfig {
 
         private Vertx vertx;
+        private InitProps props;
 
         private Class VerticleScanClazz;
         private boolean VerticleScanClazzRequired;
@@ -208,6 +226,14 @@ public class VertxBootStrap {
 
         public void setVertx(Vertx vertx) {
             this.vertx = vertx;
+        }
+
+        public InitProps getProps() {
+            return props;
+        }
+
+        public void setProps(InitProps props) {
+            this.props = props;
         }
 
         public Class getVerticleScanClazz() {

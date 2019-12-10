@@ -2,6 +2,7 @@ package cn.justl.fulcrum.core.verticles;
 
 import cn.justl.fulcrum.common.modal.QueryRequest;
 import cn.justl.fulcrum.common.modal.codec.QueryRequestMessageCodec;
+import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
 import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
@@ -35,6 +36,7 @@ public class QueryService {
             try {
                 QueryRequest request = (QueryRequest) msg.body();
                 System.out.println(request);
+                System.out.println(VertxBootStrap.getContext().getProperties().getProperty("test"));
                 msg.reply("ok");
             } catch (Throwable throwable) {
                 msg.reply("wrong");

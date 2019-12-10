@@ -2,6 +2,7 @@ package cn.justl.fulcrum.vertx.boot.context;
 
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.properties.FulcrumProperties;
 import io.vertx.core.Vertx;
 import java.util.List;
 
@@ -55,5 +56,7 @@ public interface Context {
     void registerVerticle(VerticleHolder verticleHolder);
 
     void unregisterVerticle(String id);
+
+    FulcrumProperties getProperties();
 
 }

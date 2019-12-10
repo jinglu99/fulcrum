@@ -1,7 +1,5 @@
 package cn.justl.fulcrum.core.db;
 
-import ch.vorburger.exec.ManagedProcessException;
-import ch.vorburger.mariadb4j.DB;
 
 import java.io.*;
 import java.sql.*;
@@ -17,22 +15,13 @@ import java.util.stream.Collectors;
  * @Desc :
  */
 public class DBTest {
-    public static final String db_schema = "../db/test.sql";
+    public static final String db_schema = "../db/tables.sql";
 
-    static {
-        DB database = null;
-        try {
-            database = DB.newEmbeddedDB(3307);
-            database.start();
-        } catch (ManagedProcessException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     public static Connection createConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection("jdbc:mysql://localhost:3307/test", "root", "");
+        Class.forName ("org.h2.Driver");
+        return DriverManager.getConnection("jdbc:h2:mem:fulcrum");
     }
 
 

@@ -4,6 +4,8 @@ import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
 import io.vertx.core.Vertx;
 
+import java.util.List;
+
 /**
  * @Date : 2019-11-28
  * @Author : Jinglu.Wang [jingl.wang123@gmail.com]
@@ -14,6 +16,8 @@ public interface BootStrapHandler {
     void setVertx(Vertx vertx);
 
     Vertx getVertx();
+
+    void loadProperties(List<String> propertiesPath) throws VertxBootException;
 
     void scanVerticles(String[] packages) throws VertxBootException;
 
