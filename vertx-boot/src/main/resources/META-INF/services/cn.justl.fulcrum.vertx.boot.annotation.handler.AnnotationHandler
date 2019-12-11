@@ -1,2 +1,3 @@
 cn.justl.fulcrum.vertx.boot.annotation.handler.VerticleAnnotationHandler
 cn.justl.fulcrum.vertx.boot.annotation.handler.WebVerticleAnnotationHandler
+cn.justl.fulcrum.vertx.boot.annotation.handler.CodecAnnotationHandler

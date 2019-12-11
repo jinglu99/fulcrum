@@ -53,7 +53,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         annotationHandlers.forEach(handler -> {
             for (String packagePath : packages) {
                 try {
-                    handler.scan(packagePath)
+                    handler.scan(this, packagePath)
                         .forEach(definition -> {
                             registerVerticleDefinition(definition);
                         });
@@ -73,7 +73,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         for (Class clazz : classes) {
             for (AnnotationHandler handler : annotationHandlers) {
                 if (handler.isTargetVerticle(clazz)) {
-                    registerVerticleDefinition(((VerticleParsable)handler).parseVerticle(clazz));
+                    registerVerticleDefinition(((VerticleParsable) handler).parseVerticle(clazz));
                     break;
                 }
             }
@@ -121,7 +121,8 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                         .deployVerticle(getVerticleHolder(definition.getId()).getTrueVerticle(),
                             res -> {
                                 if (res.succeeded()) {
-                                    getVerticleHolder(definition.getId()).setTrueVerticleId(res.result());
+                                    getVerticleHolder(definition.getId())
+                                        .setTrueVerticleId(res.result());
                                     latch.countDown();
                                 } else {
                                     p.fail(res.cause());

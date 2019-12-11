@@ -8,6 +8,7 @@ import cn.justl.fulcrum.vertx.boot.excetions.VerticleCloseException;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleCreationException;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Date : 2019-11-26
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 public interface AnnotationHandler {
 
-    Set<VerticleDefinition> scan(String packageName) throws AnnotationScannerException;
+    Set<VerticleDefinition> scan(Context context, String packageName) throws AnnotationScannerException;
 
     <T> VerticleHolder<T> create(Context context, VerticleDefinition<T> verticleDefinition) throws VerticleCreationException;
 

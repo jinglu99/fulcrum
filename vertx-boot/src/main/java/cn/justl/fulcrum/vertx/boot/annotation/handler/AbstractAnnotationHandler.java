@@ -35,7 +35,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
 
     @Override
-    public Set<VerticleDefinition> scan(String packageName) throws AnnotationScannerException {
+    public Set<VerticleDefinition> scan(Context context, String packageName) throws AnnotationScannerException {
         Set<VerticleDefinition> definitions = new HashSet<>();
         for (Class clazz : ClassHelper.scan(packageName, clazz -> isTargetVerticle(clazz))) {
             definitions.add(setDependent(parseVerticle(clazz)));

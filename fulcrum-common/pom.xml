@@ -24,6 +24,10 @@
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cn.justL</groupId>
+      <artifactId>vertx-boot</artifactId>
+    </dependency>
   </dependencies>
 
 

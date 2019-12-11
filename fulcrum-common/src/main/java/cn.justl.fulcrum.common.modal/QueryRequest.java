@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.common.modal;
 
+import cn.justl.fulcrum.vertx.boot.annotation.CodeC;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -8,13 +9,14 @@ import java.util.Map;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
+@CodeC
 public class QueryRequest implements Serializable {
 
     private static final long serialVersionUID = -6171225289317960039L;
-
     private String resource;
     private Map<String, Object> params;
     private Map<String, Object> options;
+
 
     public String getResource() {
         return resource;
@@ -48,4 +50,6 @@ public class QueryRequest implements Serializable {
             ", options=" + options +
             '}';
     }
+
+
 }

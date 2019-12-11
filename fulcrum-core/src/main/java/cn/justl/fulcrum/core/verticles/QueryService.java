@@ -1,7 +1,6 @@
 package cn.justl.fulcrum.core.verticles;
 
-import cn.justl.fulcrum.common.modal.QueryRequest;
-import cn.justl.fulcrum.common.modal.codec.QueryRequestMessageCodec;
+import cn.justl.fulcrum.core.data.FulcrumResource;
 import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
 import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
@@ -30,14 +29,13 @@ public class QueryService {
     private void start() {
         logger.info("QueryService starting...");
 
-        vertx.eventBus().registerDefaultCodec(QueryRequest.class, new QueryRequestMessageCodec());
-
         vertx.eventBus().consumer(QUERY_SERVICE, msg->{
             try {
-                QueryRequest request = (QueryRequest) msg.body();
-                System.out.println(request);
-                System.out.println(VertxBootStrap.getContext().getProperties().getProperty("test"));
-                msg.reply("ok");
+                FulcrumResource res = new FulcrumResource();
+                res.setId(1);
+                res.setResourceId("tesrttestsets");
+                msg.reply(res);
+//
             } catch (Throwable throwable) {
                 msg.reply("wrong");
             }

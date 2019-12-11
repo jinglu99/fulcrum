@@ -1,23 +1,18 @@
 package cn.justl.fulcrum.core.service;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import cn.justl.fulcrum.common.modal.QueryRequest;
-import cn.justl.fulcrum.common.modal.codec.QueryRequestMessageCodec;
+import cn.justl.fulcrum.core.data.FulcrumResource;
 import cn.justl.fulcrum.core.db.DBTest;
 import cn.justl.fulcrum.core.verticles.QueryService;
 import cn.justl.fulcrum.vertx.boot.InitProps;
 import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
-import cn.justl.fulcrum.vertx.boot.context.Context;
+import cn.justl.fulcrum.vertx.boot.codec.Codec;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.*;
 import java.sql.*;
-import java.util.stream.Stream;
 
 /**
  * @Date : 2019/12/6
@@ -36,6 +30,7 @@ import java.util.stream.Stream;
 @ExtendWith(VertxExtension.class)
 @VerticleScan
 public class QueryServiceTest extends DBTest {
+
     private static final String Test_Path = "/";
 
     @BeforeEach
@@ -54,19 +49,22 @@ public class QueryServiceTest extends DBTest {
     public void test(Vertx vertx, VertxTestContext testContext) {
         VertxBootStrap.runWithVerticles(vertx, new InitProps() {{
             setProperties("test1.properties");
-        }}, QueryService.class)
-                .compose(res -> {
-                    DeliveryOptions options = new DeliveryOptions().setCodecName("QueryRequestMessageCodec");
-                    vertx.eventBus()
-                            .request(QueryService.QUERY_SERVICE,
-                                    new QueryRequest() {{
-                                        setResource("test");
-                                    }}, options, r -> {
-                                        testContext.completeNow();
-                                        System.out.println(r);
-                                    });
-                    return Future.succeededFuture();
-                }).otherwise(throwable -> {
+        }}, QueryService.class, QueryRequest.class, FulcrumResource.class)
+            .compose(res -> {
+                DeliveryOptions options = new DeliveryOptions().setCodecName(
+                    Codec.getCodecName(QueryRequest.class));
+                vertx.eventBus()
+                    .request(QueryService.QUERY_SERVICE,
+                        new QueryRequest() {{
+                            setResource("test");
+                        }}, options, r -> {
+                            if (r.succeeded()) {
+                                System.out.println(r.result().body());
+                            }
+                            testContext.completeNow();
+                        });
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
             testContext.failNow(throwable);
             return Future.failedFuture(throwable);
         });
