@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot;
 
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import io.vertx.core.Verticle;
 
 /**
@@ -13,7 +13,7 @@ public class  VerticleHolder<T> {
 
     private T verticle;
 
-    private VerticleDefinition verticleDefinition;
+    private BeanDefinition verticleDefinition;
 
     private Verticle trueVerticle;
 
@@ -45,11 +45,11 @@ public class  VerticleHolder<T> {
     }
 
 
-    public VerticleDefinition getVerticleDefinition() {
+    public BeanDefinition getVerticleDefinition() {
         return verticleDefinition;
     }
 
-    public void setVerticleDefinition(VerticleDefinition verticleDefinition) {
+    public void setVerticleDefinition(BeanDefinition verticleDefinition) {
         this.verticleDefinition = verticleDefinition;
     }
 

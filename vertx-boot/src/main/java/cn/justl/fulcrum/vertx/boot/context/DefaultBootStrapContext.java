@@ -4,7 +4,7 @@ import cn.justl.fulcrum.vertx.boot.AbstractBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.handler.AnnotationHandler;
 import cn.justl.fulcrum.vertx.boot.annotation.handler.VerticleParsable;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.*;
 import io.vertx.core.Promise;
 import java.util.ArrayList;
@@ -32,11 +32,11 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
     private final ServiceLoader<AnnotationHandler> annotationHandlers = ServiceLoader
         .load(AnnotationHandler.class);
 
-    private final Set<VerticleDefinition> instantiatingDefinitions = new HashSet<>();
+    private final Set<BeanDefinition> instantiatingDefinitions = new HashSet<>();
 
-    private final Set<VerticleDefinition> instantiatedDefinitions = new HashSet<>();
+    private final Set<BeanDefinition> instantiatedDefinitions = new HashSet<>();
 
-    private final List<List<VerticleDefinition>> deployOrderLevel = new ArrayList<>();
+    private final List<List<BeanDefinition>> deployOrderLevel = new ArrayList<>();
 
     private final Promise initPromise;
 
@@ -55,7 +55,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                 try {
                     handler.scan(this, packagePath)
                         .forEach(definition -> {
-                            registerVerticleDefinition(definition);
+                            registerBeanDefinition(definition);
                         });
                 } catch (AnnotationScannerException e) {
                     logger.error("Something wrong when scan package " + packagePath, e);
@@ -73,7 +73,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         for (Class clazz : classes) {
             for (AnnotationHandler handler : annotationHandlers) {
                 if (handler.isTargetVerticle(clazz)) {
-                    registerVerticleDefinition(((VerticleParsable) handler).parseVerticle(clazz));
+                    registerBeanDefinition(((VerticleParsable) handler).parseVerticle(clazz));
                     break;
                 }
             }
@@ -83,7 +83,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
     @Override
     public void instantiateVerticles() throws VertxBootException {
         try {
-            for (VerticleDefinition definition : listVerticleDefinitions()) {
+            for (BeanDefinition definition : listBeanDefinitions()) {
                 instantiateVerticle(definition);
             }
         } catch (VerticleCreationException e) {
@@ -107,7 +107,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
 
     }
 
-    private void initializeVerticles(Promise promise, List<List<VerticleDefinition>> orderLevels) {
+    private void initializeVerticles(Promise promise, List<List<BeanDefinition>> orderLevels) {
         if (orderLevels == null || orderLevels.size() == 0) {
             promise.complete();
             return;
@@ -116,7 +116,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         getVertx().executeBlocking(p -> {
             try {
                 CountDownLatch latch = new CountDownLatch(orderLevels.get(0).size());
-                for (VerticleDefinition definition : orderLevels.get(0)) {
+                for (BeanDefinition definition : orderLevels.get(0)) {
                     getVertx()
                         .deployVerticle(getVerticleHolder(definition.getId()).getTrueVerticle(),
                             res -> {
@@ -157,7 +157,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                     if (handler.isTargetVerticle(holder.getVerticleDefinition().getClazz())) {
                         handler.close(this, holder.getVerticleDefinition(), holder);
                         unregisterVerticle(holder.getId());
-                        unregisterVerticleDefinition(holder.getId());
+                        unregisterBeanDefinition(holder.getId());
                         logger.info("unregister verticle {}", holder.getId());
                         break;
                     }
@@ -171,11 +171,11 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
     }
 
     @Override
-    public Context getContext() {
+    public BootStrapContext getContext() {
         return this;
     }
 
-    private void instantiateVerticle(VerticleDefinition verticleDefinition)
+    private void instantiateVerticle(BeanDefinition verticleDefinition)
         throws VerticleCreationException {
         if (instantiatingDefinitions.contains(verticleDefinition)) {
             logger.error("There is Circular dependency occurred in {}",
@@ -196,7 +196,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
             logger.info("Verticle {} is depend on {}", verticleDefinition.getId(),
                 verticleDefinition.getDependOn());
             for (String dependOn : verticleDefinition.getDependOn()) {
-                VerticleDefinition definition = getVerticleDefinition(dependOn);
+                BeanDefinition definition = getBeanDefinition(dependOn);
                 if (definition == null) {
                     logger.warn("There is no Verticle called {} registered in Context", dependOn);
                     continue;
@@ -225,51 +225,13 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         instantiatingDefinitions.remove(verticleDefinition);
     }
 
-//    private void initializeVerticle(VerticleHolder verticleHolder)
-//        throws VerticleInitializeException {
-//
-//        initializingVerticles.add(verticleHolder);
-//
-//        if (verticleHolder.getVerticleDefinition().getDependOn() != null) {
-//            logger.info("Verticle init {} is depend on {}", verticleHolder.getId(),
-//                verticleHolder.getVerticleDefinition().getDependOn());
-//            for (String dependOn : verticleHolder.getVerticleDefinition().getDependOn()) {
-//                VerticleHolder holder = getVerticleHolder(dependOn);
-//                if (holder == null) {
-//                    continue;
-//                }
-//
-//                if (getVerticleHolder(dependOn) != null) {
-//                    continue;
-//                }
-//
-//                initializeVerticle(holder);
-//            }
-//        }
-//
-//        Iterator iterator = annotationHandlers.iterator();
-//        while (iterator.hasNext()) {
-//            AnnotationHandler handler = (AnnotationHandler) iterator.next();
-//            if (handler.satisfied(verticleHolder.getVerticleDefinition().getClazz())) {
-//                VerticleHolder holder = handler
-//                    .initialize(this, verticleHolder.getVerticleDefinition(), verticleHolder);
-//                logger.info("Initialize verticle {}", holder.getId());
-//                break;
-//            }
-//        }
-//
-//        initializedVerticles.add(verticleHolder);
-//        initializingVerticles.remove(verticleHolder);
-//    }
-
-
     private void orderDeploySequence() {
-        for (VerticleDefinition definition : listVerticleDefinitions()) {
+        for (BeanDefinition definition : listBeanDefinitions()) {
             orderDeployVerticle(definition);
         }
     }
 
-    private int orderDeployVerticle(VerticleDefinition definition) {
+    private int orderDeployVerticle(BeanDefinition definition) {
         if (definition.getDeployLevel() > -1) {
             return definition.getDeployLevel();
         }
@@ -278,13 +240,13 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
             return addVerticleToOrderLevel(0, definition);
         }
 
-        List<VerticleDefinition> dependOnVerticles = Stream.of(definition.getDependOn())
-            .map(id -> getVerticleDefinition(id))
+        List<BeanDefinition> dependOnVerticles = Stream.of(definition.getDependOn())
+            .map(id -> getBeanDefinition(id))
             .filter(verticle -> verticle != null)
             .collect(Collectors.toList());
 
         int maxLevel = 0;
-        for (VerticleDefinition depend : dependOnVerticles) {
+        for (BeanDefinition depend : dependOnVerticles) {
             int level = orderDeployVerticle(depend);
             if (maxLevel < level) {
                 maxLevel = level;
@@ -294,8 +256,8 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         return addVerticleToOrderLevel(maxLevel + 1, definition);
     }
 
-    private int addVerticleToOrderLevel(int level, VerticleDefinition definition) {
-        List<VerticleDefinition> levelList = null;
+    private int addVerticleToOrderLevel(int level, BeanDefinition definition) {
+        List<BeanDefinition> levelList = null;
         if (deployOrderLevel.size() <= level || (levelList = deployOrderLevel.get(level)) == null) {
             levelList = new ArrayList<>();
             deployOrderLevel.add(level, levelList);

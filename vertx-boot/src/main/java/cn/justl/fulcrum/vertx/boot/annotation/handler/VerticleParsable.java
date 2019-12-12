@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
 
 /**
@@ -9,5 +9,5 @@ import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
  * @Desc :
  */
 public interface VerticleParsable {
-    VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
+    BeanDefinition parseVerticle(Class clazz) throws AnnotationScannerException;
 }

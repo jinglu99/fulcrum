@@ -1,13 +1,14 @@
 package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleInitializeException;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.Start;
-import cn.justl.fulcrum.vertx.boot.definition.DefaultVerticleDefinition;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleStartException;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
@@ -37,9 +38,9 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
     }
 
     @Override
-    public VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
+    public BeanDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
         Verticle verticle = (Verticle) clazz.getAnnotation(Verticle.class);
-        VerticleDefinition definition = new DefaultVerticleDefinition();
+        BeanDefinition definition = new DefaultBeanDefinition();
 
         String id =
             verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase()
@@ -51,7 +52,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
     }
 
     @Override
-    <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition,
+    <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder) throws VerticleStartException {
         try {
             callStart(context, verticleDefinition.getClazz(), verticleHolder.getVerticle());
@@ -61,13 +62,13 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
     }
 
     @Override
-    void doClose(Context context, VerticleDefinition verticleDefinition,
+    void doClose(BootStrapContext context, BeanDefinition verticleDefinition,
         VerticleHolder verticleHolder) {
 
     }
 
 
-    private <T> void callStart(Context context, Class<T> clazz, T obj)
+    private <T> void callStart(BootStrapContext context, Class<T> clazz, T obj)
         throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
         if ((methods = clazz.getDeclaredMethods()) == null) {

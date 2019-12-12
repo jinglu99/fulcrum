@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot;
+package cn.justl.fulcrum.vertx.boot.helper;
 
 import java.io.File;
 import java.io.FileFilter;

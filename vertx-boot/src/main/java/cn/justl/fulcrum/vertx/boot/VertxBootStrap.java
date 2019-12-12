@@ -1,10 +1,10 @@
 package cn.justl.fulcrum.vertx.boot;
 
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
-import cn.justl.fulcrum.vertx.boot.context.Context;
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.DefaultBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
-import io.netty.bootstrap.BootstrapConfig;
+import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -115,7 +115,7 @@ public class VertxBootStrap {
         });
     }
 
-    public static Context getContext() {
+    public static BootStrapContext getContext() {
         if (handler == null) {
             return null;
         } else {

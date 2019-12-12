@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot.properties;
 
-import cn.justl.fulcrum.vertx.boot.ClassHelper;
+import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -3,9 +3,10 @@ package cn.justl.fulcrum.vertx.boot.annotation.handler;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.HttpRouter;
 import cn.justl.fulcrum.vertx.boot.annotation.WebVerticle;
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.Context;
-import cn.justl.fulcrum.vertx.boot.definition.DefaultVerticleDefinition;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleStartException;
 import cn.justl.fulcrum.vertx.boot.web.WebConstants;
@@ -14,8 +15,6 @@ import io.vertx.ext.web.Router;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -31,9 +30,9 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler impl
     private static final Logger logger = LoggerFactory.getLogger(WebVerticleAnnotationHandler.class);
 
     @Override
-    public VerticleDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
+    public BeanDefinition parseVerticle(Class clazz) throws AnnotationScannerException {
         WebVerticle verticle = (WebVerticle) clazz.getDeclaredAnnotation(WebVerticle.class);
-        VerticleDefinition definition = new DefaultVerticleDefinition();
+        BeanDefinition definition = new DefaultBeanDefinition();
         String id =
             verticle.value().equals("") ? clazz.getSimpleName().substring(0, 1).toLowerCase()
                 + clazz.getSimpleName().substring(1) : verticle.value();
@@ -43,7 +42,7 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler impl
     }
 
     @Override
-    <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition,
+    <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder) throws VerticleStartException {
 
         HttpRouter rootRoute = verticleDefinition.getClazz()
@@ -105,7 +104,7 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler impl
     }
 
     @Override
-    void doClose(Context context, VerticleDefinition verticleDefinition,
+    void doClose(BootStrapContext context, BeanDefinition verticleDefinition,
         VerticleHolder verticleHolder) {
 
     }

@@ -1,5 +1,6 @@
 package cn.justl.fulcrum.vertx.boot;
 
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
 import io.vertx.core.Vertx;
@@ -29,6 +30,6 @@ public interface BootStrapHandler {
 
     void close() throws VertxBootException;
 
-    Context getContext();
+    BootStrapContext getContext();
 
 }

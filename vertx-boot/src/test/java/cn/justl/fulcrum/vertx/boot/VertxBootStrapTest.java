@@ -1,9 +1,8 @@
 package cn.justl.fulcrum.vertx.boot;
 
-import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
-import cn.justl.fulcrum.vertx.boot.context.Context;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.VerticleCreationException;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.Monitor;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.TestVerticle1;
@@ -14,7 +13,6 @@ import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,9 +34,9 @@ public class VertxBootStrapTest {
         VertxBootStrap.run(vertx, this.getClass())
             .compose(res -> {
                 testContext.verify(() -> {
-                    Context context = VertxBootStrap.getContext();
+                    BootStrapContext context = VertxBootStrap.getContext();
                     assertNotNull(context.getVertx());
-                    assertTrue(context.listVerticleDefinitions().size() > 0);
+                    assertTrue(context.listBeanDefinitions().size() > 0);
                     assertTrue(context.listVerticleHolders().size() > 0);
                 }).completeNow();
                 return Future.succeededFuture();
@@ -55,9 +53,9 @@ public class VertxBootStrapTest {
             .run(vertx, "cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap")
             .compose(res -> {
                 testContext.verify(() -> {
-                    Context context = VertxBootStrap.getContext();
+                    BootStrapContext context = VertxBootStrap.getContext();
                     assertNotNull(context.getVertx());
-                    assertTrue(context.listVerticleDefinitions().size() > 0);
+                    assertTrue(context.listBeanDefinitions().size() > 0);
                     assertTrue(context.listVerticleHolders().size() > 0);
                 }).completeNow();
                 return Future.succeededFuture();
@@ -90,8 +88,8 @@ public class VertxBootStrapTest {
         VertxBootStrap.run(vertx, this.getClass())
             .compose(res -> {
                 testContext.verify(() -> {
-                    Context context = VertxBootStrap.getContext();
-                    VerticleDefinition definition = context.getVerticleDefinition("testVerticle1");
+                    BootStrapContext context = VertxBootStrap.getContext();
+                    BeanDefinition definition = context.getBeanDefinition("testVerticle1");
                     assertNotNull(definition);
                     assertEquals(TestVerticle1.class, definition.getClazz());
                     VerticleHolder verticleHolder = context.getVerticleHolder("testVerticle1");

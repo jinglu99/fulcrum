@@ -1,7 +1,8 @@
 package cn.justl.fulcrum.vertx.boot;
 
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.Context;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
 import cn.justl.fulcrum.vertx.boot.properties.DefaultFulcrumProperties;
 import cn.justl.fulcrum.vertx.boot.properties.FulcrumProperties;
@@ -18,14 +19,14 @@ import org.slf4j.LoggerFactory;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public abstract class AbstractBootStrapContext implements Context, BootStrapHandler {
+public abstract class AbstractBootStrapContext implements BootStrapContext, BootStrapHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBootStrapContext.class);
 
     private Vertx vertx;
     private FulcrumProperties properties = new DefaultFulcrumProperties();
 
-    private Map<String, VerticleDefinition> definitionMap = new HashMap<>();
+    private Map<String, BeanDefinition> definitionMap = new HashMap<>();
     private Map<String, VerticleHolder> verticles = new HashMap<>();
 
     @Override
@@ -52,27 +53,27 @@ public abstract class AbstractBootStrapContext implements Context, BootStrapHand
     }
 
     @Override
-    public VerticleDefinition getVerticleDefinition(String id) {
+    public BeanDefinition getBeanDefinition(String id) {
         return definitionMap.get(id);
     }
 
     @Override
-    public List<VerticleDefinition> listVerticleDefinitions() {
+    public List<BeanDefinition> listBeanDefinitions() {
         return new ArrayList<>(definitionMap.values());
     }
 
     @Override
-    public void registerVerticleDefinition(VerticleDefinition verticleDefinition) {
+    public void registerBeanDefinition(BeanDefinition verticleDefinition) {
         if (definitionMap.containsKey(verticleDefinition.getId())) {
             logger.warn("VerticleDefinition {}:{} has been registered, it will by replaced by {}",
-                    verticleDefinition.getId(), getVerticleDefinition(verticleDefinition.getId()).getClazz().getName(),
+                    verticleDefinition.getId(), getBeanDefinition(verticleDefinition.getId()).getClazz().getName(),
                     verticleDefinition.getClazz().getName());
         }
         definitionMap.put(verticleDefinition.getId(), verticleDefinition);
     }
 
     @Override
-    public void unregisterVerticleDefinition(String id) {
+    public void unregisterBeanDefinition(String id) {
         definitionMap.remove(id);
     }
 

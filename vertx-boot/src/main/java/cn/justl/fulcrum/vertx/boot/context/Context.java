@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.vertx.boot.context;
 
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.properties.FulcrumProperties;
 import io.vertx.core.Vertx;
 import java.util.List;
@@ -13,32 +13,32 @@ import java.util.List;
  */
 public interface Context {
 
-    /**
-     * get the {@link Vertx} Object.
-     */
-    Vertx getVertx();
-
-    /**
-     * set a {@link Vertx} Object.
-     */
-    void setVertx(Vertx vertx);
-
-    /**
-     * Get a {@link VerticleDefinition} by given ID.
-     */
-    VerticleDefinition getVerticleDefinition(String id);
-
-    /**
-     * List all {@link VerticleDefinition} registered in Context.
-     */
-    List<VerticleDefinition> listVerticleDefinitions();
-
-    /**
-     * register a {@link VerticleDefinition} in Context.
-     */
-    void registerVerticleDefinition(VerticleDefinition verticleDefinition);
-
-    void unregisterVerticleDefinition(String id);
+//    /**
+//     * get the {@link Vertx} Object.
+//     */
+//    Vertx getVertx();
+//
+//    /**
+//     * set a {@link Vertx} Object.
+//     */
+//    void setVertx(Vertx vertx);
+//
+//    /**
+//     * Get a {@link BeanDefinition} by given ID.
+//     */
+//    BeanDefinition getVerticleDefinition(String id);
+//
+//    /**
+//     * List all {@link BeanDefinition} registered in Context.
+//     */
+//    List<BeanDefinition> listVerticleDefinitions();
+//
+//    /**
+//     * register a {@link BeanDefinition} in Context.
+//     */
+//    void registerVerticleDefinition(BeanDefinition verticleDefinition);
+//
+//    void unregisterVerticleDefinition(String id);
 
     /**
      * Get a {@link VerticleHolder} by given ID.

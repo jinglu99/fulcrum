@@ -1,14 +1,14 @@
 package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
-import cn.justl.fulcrum.vertx.boot.ClassHelper;
+import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
 import cn.justl.fulcrum.vertx.boot.annotation.DependOn;
 import cn.justl.fulcrum.vertx.boot.annotation.PostStart;
 import cn.justl.fulcrum.vertx.boot.annotation.PreStart;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
-import cn.justl.fulcrum.vertx.boot.context.Context;
+import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.excetions.*;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
-import cn.justl.fulcrum.vertx.boot.definition.VerticleDefinition;
+import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Verticle;
 import org.slf4j.Logger;
@@ -35,8 +35,8 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
 
     @Override
-    public Set<VerticleDefinition> scan(Context context, String packageName) throws AnnotationScannerException {
-        Set<VerticleDefinition> definitions = new HashSet<>();
+    public Set<BeanDefinition> scan(BootStrapContext context, String packageName) throws AnnotationScannerException {
+        Set<BeanDefinition> definitions = new HashSet<>();
         for (Class clazz : ClassHelper.scan(packageName, clazz -> isTargetVerticle(clazz))) {
             definitions.add(setDependent(parseVerticle(clazz)));
         }
@@ -45,7 +45,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
 
     @Override
-    public <T> VerticleHolder<T> create(Context context, VerticleDefinition<T> verticleDefinition)
+    public <T> VerticleHolder<T> create(BootStrapContext context, BeanDefinition<T> verticleDefinition)
         throws VerticleCreationException {
         try {
             VerticleHolder holder = new VerticleHolder();
@@ -63,7 +63,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
 
     @Override
-    public <T> void close(Context context, VerticleDefinition<T> verticleDefinition,
+    public <T> void close(BootStrapContext context, BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder) throws VerticleCloseException {
         try {
             AtomicReference<Throwable> throwable = new AtomicReference<>();
@@ -83,7 +83,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
         }
     }
 
-    protected Verticle createVerticle(Context cxt, VerticleDefinition verticleDefinition,
+    protected Verticle createVerticle(BootStrapContext cxt, BeanDefinition verticleDefinition,
         VerticleHolder verticleHolder) {
         return new AbstractVerticle() {
             @Override
@@ -105,14 +105,14 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
     }
 
 
-    abstract <T> void doStart(Context context, VerticleDefinition<T> verticleDefinition,
+    abstract <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder) throws VerticleStartException;
 
-    abstract void doClose(Context context, VerticleDefinition verticleDefinition,
+    abstract void doClose(BootStrapContext context, BeanDefinition verticleDefinition,
         VerticleHolder verticleHolder);
 
 
-    protected <T> void injectVertx(Context context, VerticleDefinition<T> verticleDefinition,
+    protected <T> void injectVertx(BootStrapContext context, BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder) throws IllegalAccessException {
         Field[] fields = null;
         if ((fields = verticleDefinition.getClazz().getDeclaredFields()) == null) {
@@ -128,7 +128,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
         }
     }
 
-    protected <T> void callPreStart(VerticleDefinition<T> verticleDefinition,
+    protected <T> void callPreStart(BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder)
         throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
         Method[] methods = null;
@@ -152,7 +152,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
         preStartMethods.get(0).invoke(verticleHolder.getVerticle());
     }
 
-    protected <T> void callPostStart(VerticleDefinition<T> verticleDefinition,
+    protected <T> void callPostStart(BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder)
         throws VerticleInitializeException, InvocationTargetException, IllegalAccessException {
         Method[] methods = null;
@@ -177,7 +177,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
         postStartMethods.get(0).invoke(verticleHolder.getVerticle());
     }
 
-    protected VerticleDefinition setDependent(VerticleDefinition definition) {
+    protected BeanDefinition setDependent(BeanDefinition definition) {
         DependOn dependOn = (DependOn) definition.getClazz().getAnnotation(DependOn.class);
         if (dependOn == null || dependOn.value().length == 0) {
             return definition;

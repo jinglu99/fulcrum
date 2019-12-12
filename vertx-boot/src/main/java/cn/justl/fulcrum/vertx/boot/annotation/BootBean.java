@@ -8,13 +8,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Date : 2019/11/23
+ * @Date : 2019/12/12
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@BootBean
-public @interface Verticle {
-    String value() default "";
+@Documented
+public @interface BootBean {
 }

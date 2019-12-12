@@ -5,7 +5,7 @@ package cn.justl.fulcrum.vertx.boot.definition;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public class DefaultVerticleDefinition implements VerticleDefinition {
+public class DefaultBeanDefinition implements BeanDefinition {
 
     private String id;
     private Class clazz;

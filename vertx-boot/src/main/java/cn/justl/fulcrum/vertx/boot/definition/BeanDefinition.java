@@ -5,7 +5,7 @@ package cn.justl.fulcrum.vertx.boot.definition;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-public interface VerticleDefinition<T> {
+public interface BeanDefinition<T> {
 
     /**
      * Set ID for Verticle.
