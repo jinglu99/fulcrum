@@ -7,8 +7,8 @@ import cn.justl.fulcrum.vertx.boot.codec.Codec;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleCloseException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleCreationException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCloseException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
 import java.util.Set;
 
 /**
@@ -28,13 +28,13 @@ public class CodecAnnotationHandler implements AnnotationHandler, VerticleParsab
 
     @Override
     public <T> VerticleHolder<T> create(BootStrapContext context, BeanDefinition<T> verticleDefinition)
-        throws VerticleCreationException {
+        throws BeanCreationException {
         return null;
     }
 
     @Override
     public <T> void close(BootStrapContext context, BeanDefinition<T> verticleDefinition,
-        VerticleHolder<T> verticleHolder) throws VerticleCloseException {
+        VerticleHolder<T> verticleHolder) throws BeanCloseException {
     }
 
     @Override

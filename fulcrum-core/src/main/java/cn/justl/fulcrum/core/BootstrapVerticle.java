@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.core;
 
 import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
-import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
+import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -11,7 +11,7 @@ import io.vertx.core.Promise;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  */
-@VerticleScan
+@VertxScan
 public class BootstrapVerticle extends AbstractVerticle {
 
     @Override

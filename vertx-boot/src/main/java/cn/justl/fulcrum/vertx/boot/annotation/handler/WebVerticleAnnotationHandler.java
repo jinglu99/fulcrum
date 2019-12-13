@@ -4,11 +4,10 @@ import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.HttpRouter;
 import cn.justl.fulcrum.vertx.boot.annotation.WebVerticle;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
-import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleStartException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanStartException;
 import cn.justl.fulcrum.vertx.boot.web.WebConstants;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
@@ -43,7 +42,7 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler impl
 
     @Override
     <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
-        VerticleHolder<T> verticleHolder) throws VerticleStartException {
+        VerticleHolder<T> verticleHolder) throws BeanStartException {
 
         HttpRouter rootRoute = verticleDefinition.getClazz()
             .getDeclaredAnnotation(HttpRouter.class);
@@ -110,7 +109,7 @@ public class WebVerticleAnnotationHandler extends AbstractAnnotationHandler impl
     }
 
     @Override
-    public boolean isTargetVerticle(Class clazz) {
+    public boolean isTargetBean(Class clazz) {
         return clazz.getDeclaredAnnotation(WebVerticle.class) != null;
     }
 

@@ -2,14 +2,13 @@ package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
-import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleInitializeException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleStartException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanStartException;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +52,11 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
 
     @Override
     <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
-        VerticleHolder<T> verticleHolder) throws VerticleStartException {
+        VerticleHolder<T> verticleHolder) throws BeanStartException {
         try {
             callStart(context, verticleDefinition.getClazz(), verticleHolder.getVerticle());
         } catch (Throwable e) {
-            throw new VerticleStartException("Failed to execute start option", e);
+            throw new BeanStartException("Failed to execute start option", e);
         }
     }
 
@@ -69,7 +68,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
 
 
     private <T> void callStart(BootStrapContext context, Class<T> clazz, T obj)
-        throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+        throws InvocationTargetException, IllegalAccessException, BeanInitializeException {
         Method[] methods = null;
         if ((methods = clazz.getDeclaredMethods()) == null) {
             return;
@@ -84,7 +83,7 @@ public class VerticleAnnotationHandler extends AbstractAnnotationHandler impleme
             return;
         }
         if (preStartMethods.size() > 1) {
-            throw new VerticleInitializeException(
+            throw new BeanInitializeException(
                 "More than one PreStart declared in " + clazz.getName());
         }
 

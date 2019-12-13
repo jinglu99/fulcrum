@@ -1,7 +1,8 @@
-package cn.justl.fulcrum.vertx.boot.context.loader;
+package cn.justl.fulcrum.vertx.boot.definition.loader;
 
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
+import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public interface BeanClassLoader {
      * Load definitions.
      * @return
      */
-    Set<Class> loadBeanClasses();
+    Set<Class> loadBeanClasses() throws DefinitionLoadException;
 
     /**
      * Get parent BeanDefinitionLoader.

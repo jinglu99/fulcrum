@@ -1,14 +1,13 @@
 package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
 import cn.justl.fulcrum.vertx.boot.VerticleHolder;
+import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
-import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
-import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleCloseException;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleCreationException;
-
-import java.util.Set;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCloseException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
 
 /**
  * @Date : 2019-11-26
@@ -17,12 +16,15 @@ import java.util.Set;
  */
 public interface AnnotationHandler {
 
-    Set<BeanDefinition> scan(BootStrapContext context, String packageName) throws AnnotationScannerException;
+    BeanDefinition parseBeanDefinition(BootStrapContext context, Class clazz)
+        throws BeanDefinitionParseException;
 
-    <T> VerticleHolder<T> create(BootStrapContext context, BeanDefinition<T> verticleDefinition) throws VerticleCreationException;
+    BeanHolder creatBean(BootStrapContext context, BeanDefinition beanDefinition) throws BeanCreationException;
 
-    <T> void close(BootStrapContext context, BeanDefinition<T> verticleDefinition, VerticleHolder<T> verticleHolder) throws VerticleCloseException;
+    BeanHolder initBean(BootStrapContext context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanInitializeException;
 
-    boolean isTargetVerticle(Class clazz);
+    void close(BootStrapContext context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanCloseException;
+
+    boolean isTargetBean(Class clazz);
 
 }

@@ -1,9 +1,9 @@
 package cn.justl.fulcrum.vertx.boot;
 
-import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
+import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
-import cn.justl.fulcrum.vertx.boot.excetions.VerticleCreationException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.Monitor;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.TestVerticle1;
 import cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap.TestVerticle2;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(VertxExtension.class)
 @DisplayName("Test for VertxBootStrap")
-@VerticleScan("cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap")
+@VertxScan("cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap")
 public class VertxBootStrapTest {
 
     @Test
@@ -75,7 +75,7 @@ public class VertxBootStrapTest {
                 return Future.succeededFuture();
             }).otherwise(throwable -> {
             testContext.verify(() -> {
-                assertThrows(VerticleCreationException.class, () -> {
+                assertThrows(BeanCreationException.class, () -> {
                     throw throwable;
                 });
             }).completeNow();

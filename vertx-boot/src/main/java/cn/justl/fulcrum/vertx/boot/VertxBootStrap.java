@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot;
 
-import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
+import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 import cn.justl.fulcrum.vertx.boot.context.DefaultBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
@@ -29,7 +29,7 @@ public class VertxBootStrap {
     private static BootStrapHandler handler;
 
     /**
-     * Initialize Vertx-Boot with given {@link VerticleScan} annotated class.
+     * Initialize Vertx-Boot with given {@link VertxScan} annotated class.
      */
     public static synchronized Future<Void> run(Vertx vertx, Class clazz) {
         return run(vertx, new InitProps(), clazz);
@@ -144,7 +144,7 @@ public class VertxBootStrap {
         throws VertxBootException {
         Class clazz;
         if ((clazz = config.getVerticleScanClazz()) != null) {
-            VerticleScan verticleScan = (VerticleScan) clazz.getAnnotation(VerticleScan.class);
+            VertxScan verticleScan = (VertxScan) clazz.getAnnotation(VertxScan.class);
             String[] packages =
                 verticleScan.value().length == 0 ? new String[]{clazz.getPackage().getName()}
                     : verticleScan.value();

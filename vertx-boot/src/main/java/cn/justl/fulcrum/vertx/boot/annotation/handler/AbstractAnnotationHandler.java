@@ -37,7 +37,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
     @Override
     public Set<BeanDefinition> scan(BootStrapContext context, String packageName) throws AnnotationScannerException {
         Set<BeanDefinition> definitions = new HashSet<>();
-        for (Class clazz : ClassHelper.scan(packageName, clazz -> isTargetVerticle(clazz))) {
+        for (Class clazz : ClassHelper.scan(packageName, clazz -> isTargetBean(clazz))) {
             definitions.add(setDependent(parseVerticle(clazz)));
         }
         return definitions;
@@ -46,7 +46,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
     @Override
     public <T> VerticleHolder<T> create(BootStrapContext context, BeanDefinition<T> verticleDefinition)
-        throws VerticleCreationException {
+        throws BeanCreationException {
         try {
             VerticleHolder holder = new VerticleHolder();
             holder.setId(verticleDefinition.getId());
@@ -56,7 +56,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
             return holder;
         } catch (Throwable e) {
             logger.error("Failed to instantiate Verticle");
-            throw new VerticleCreationException(
+            throw new BeanCreationException(
                 "Failed to instantiate Verticle: " + verticleDefinition.getClazz().getName(), e);
         }
     }
@@ -64,7 +64,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
     @Override
     public <T> void close(BootStrapContext context, BeanDefinition<T> verticleDefinition,
-        VerticleHolder<T> verticleHolder) throws VerticleCloseException {
+        VerticleHolder<T> verticleHolder) throws BeanCloseException {
         try {
             AtomicReference<Throwable> throwable = new AtomicReference<>();
             context.getVertx().undeploy(verticleHolder.getTrueVerticleId(), res -> {
@@ -78,7 +78,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
             }
         } catch (Throwable throwable) {
             logger.error("Fail to close the verticle: " + verticleHolder.getId(), throwable);
-            throw new VerticleCloseException(
+            throw new BeanCloseException(
                 "Fail to close the verticle: " + verticleHolder.getId(), throwable);
         }
     }
@@ -106,7 +106,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
 
     abstract <T> void doStart(BootStrapContext context, BeanDefinition<T> verticleDefinition,
-        VerticleHolder<T> verticleHolder) throws VerticleStartException;
+        VerticleHolder<T> verticleHolder) throws BeanStartException;
 
     abstract void doClose(BootStrapContext context, BeanDefinition verticleDefinition,
         VerticleHolder verticleHolder);
@@ -130,7 +130,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
     protected <T> void callPreStart(BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder)
-        throws InvocationTargetException, IllegalAccessException, VerticleInitializeException {
+        throws InvocationTargetException, IllegalAccessException, BeanInitializeException {
         Method[] methods = null;
         if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) {
             return;
@@ -145,7 +145,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
             return;
         }
         if (preStartMethods.size() > 1) {
-            throw new VerticleInitializeException(
+            throw new BeanInitializeException(
                 "More than one PreStart declared in " + verticleDefinition.getClazz().getName());
         }
         preStartMethods.get(0).setAccessible(true);
@@ -154,7 +154,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
 
     protected <T> void callPostStart(BeanDefinition<T> verticleDefinition,
         VerticleHolder<T> verticleHolder)
-        throws VerticleInitializeException, InvocationTargetException, IllegalAccessException {
+        throws BeanInitializeException, InvocationTargetException, IllegalAccessException {
         Method[] methods = null;
         if ((methods = verticleDefinition.getClazz().getDeclaredMethods()) == null) {
             return;
@@ -169,7 +169,7 @@ public abstract class AbstractAnnotationHandler implements AnnotationHandler, Ve
             return;
         }
         if (postStartMethods.size() > 1) {
-            throw new VerticleInitializeException(
+            throw new BeanInitializeException(
                 "More than one PostStart declared in " + verticleDefinition.getClazz().getName());
         }
 

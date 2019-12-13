@@ -6,7 +6,7 @@ import cn.justl.fulcrum.core.db.DBTest;
 import cn.justl.fulcrum.core.verticles.QueryService;
 import cn.justl.fulcrum.vertx.boot.InitProps;
 import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
-import cn.justl.fulcrum.vertx.boot.annotation.VerticleScan;
+import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import cn.justl.fulcrum.vertx.boot.codec.Codec;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -28,7 +28,7 @@ import java.sql.*;
  */
 @DisplayName("Test for QueryService")
 @ExtendWith(VertxExtension.class)
-@VerticleScan
+@VertxScan
 public class QueryServiceTest extends DBTest {
 
     private static final String Test_Path = "/";
