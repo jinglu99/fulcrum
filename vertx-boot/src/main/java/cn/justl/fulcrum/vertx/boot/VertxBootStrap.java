@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.vertx.boot;
 
 import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
-import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
+import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.context.DefaultBootStrapContext;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
 import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
@@ -26,7 +26,7 @@ public class VertxBootStrap {
 
     private static final Logger logger = LoggerFactory.getLogger(VertxBootStrap.class);
 
-    private static BootStrapHandler handler;
+    private static Context context;
 
     /**
      * Initialize Vertx-Boot with given {@link VertxScan} annotated class.
@@ -44,7 +44,15 @@ public class VertxBootStrap {
                 config.setProps(props);
                 config.setVerticleScanClazz(clazz);
                 config.setVerticleScanClazzRequired(true);
-                doRun(config);
+                doRun(config)
+                    .compose(res -> {
+                        promise.complete();
+                        return Future.succeededFuture();
+                    }).otherwise(throwable -> {
+                    logger.error("Fail to start Vertx-Boot!", throwable);
+                    promise.fail(throwable);
+                    return Future.failedFuture(throwable);
+                });
             } catch (Throwable e) {
                 logger.error("VertX-Boot initializing failed", e);
                 promise.fail(e);
@@ -68,7 +76,15 @@ public class VertxBootStrap {
                 config.setProps(props);
                 config.setPackages(packages.split(","));
                 config.setPackagesRequired(true);
-                doRun(config);
+                doRun(config)
+                    .compose(res -> {
+                        promise.complete();
+                        return Future.succeededFuture();
+                    }).otherwise(throwable -> {
+                    logger.error("Fail to start Vertx-Boot!", throwable);
+                    promise.fail(throwable);
+                    return Future.failedFuture(throwable);
+                });
             } catch (Throwable e) {
                 logger.error("VertX-Boot initializing failed", e);
                 promise.fail(e);
@@ -83,7 +99,8 @@ public class VertxBootStrap {
         return runWithVerticles(vertx, new InitProps(), verticles);
     }
 
-    public static synchronized Future<Void> runWithVerticles(Vertx vertx, InitProps props, Class... verticles) {
+    public static Future<Void> runWithVerticles(Vertx vertx, InitProps props,
+        Class... verticles) {
         return Future.future(promise -> {
             try {
                 BootStrapConfig config = new BootStrapConfig();
@@ -92,7 +109,16 @@ public class VertxBootStrap {
                 config.setProps(props);
                 config.setVerticles(verticles);
                 config.setVerticlesRequired(true);
-                doRun(config);
+
+                doRun(config)
+                    .compose(res -> {
+                        promise.complete();
+                        return Future.succeededFuture();
+                    }).otherwise(throwable -> {
+                    logger.error("Fail to start Vertx-Boot!", throwable);
+                    promise.fail(throwable);
+                    return Future.failedFuture(throwable);
+                });
             } catch (Throwable e) {
                 logger.error("VertX-Boot initializing failed", e);
                 promise.fail(e);
@@ -101,106 +127,57 @@ public class VertxBootStrap {
     }
 
     public static Future<Void> close() {
+        return context.close()
+            .compose(res -> {
+                context = null;
+                return Future.succeededFuture();
+            });
+    }
+
+    public static Context getContext() {
+        return context;
+    }
+
+    private static Future<Void> checkHandler(Void obj) {
         return Future.future(promise -> {
             try {
-                logger.info("Closing VertX-Boot...");
-                handler.close();
-                handler = null;
-                logger.info("Closing VertX-Boot successfully.");
+                if (context != null) {
+                    logger.warn(
+                        "VertxBootStrap.run() has been called, a new context will be created and the old one will be closed!");
+                    context.close();
+                }
+                context = new DefaultBootStrapContext();
+                logger.info("Vertx-Boot Context created!");
                 promise.complete();
-            } catch (VertxBootException e) {
-                logger.error("VertX-Boot closing failed", e);
-                promise.fail(e);
+            } catch (Exception e) {
+                promise.fail(new VertxBootException("Failed to create new Vertx Boot context", e));
             }
         });
+
     }
 
-    public static BootStrapContext getContext() {
-        if (handler == null) {
-            return null;
-        } else {
-            return handler.getContext();
-        }
+
+    private static Future<Void> doRun(BootStrapConfig config) {
+        return printLogo()
+            .compose(VertxBootStrap::checkHandler)
+            .compose(res -> context.init());
     }
 
-    private static void checkHandler(Promise promise) throws VertxBootException {
-        if (handler != null) {
-            logger.warn(
-                "VertxBootStrap.run() has been called, a new context will be created and the old one will be closed!");
-            handler.close();
-        }
-        handler = new DefaultBootStrapContext(promise);
-    }
+    private static Future<Void> printLogo() {
+        return Future.future(promise -> {
+            try {
+                InputStream in = ClassHelper.getClassLoader()
+                    .getResourceAsStream(Constants.LOGO_PATH);
+                System.out.println(new BufferedReader(new InputStreamReader(in))
+                    .lines().collect(Collectors.joining(System.lineSeparator())));
+                logger.info("Start to initialize Vertx-Boot Context...");
 
-    private static void scanVerticles(BootStrapConfig config) throws VertxBootException {
-        scanByVerticleScanIfNeeded(config);
-
-        scanByGivenPackagesIfNeeded(config);
-
-        scanByGivenVerticles(config);
-    }
-
-    private static void scanByVerticleScanIfNeeded(BootStrapConfig config)
-        throws VertxBootException {
-        Class clazz;
-        if ((clazz = config.getVerticleScanClazz()) != null) {
-            VertxScan verticleScan = (VertxScan) clazz.getAnnotation(VertxScan.class);
-            String[] packages =
-                verticleScan.value().length == 0 ? new String[]{clazz.getPackage().getName()}
-                    : verticleScan.value();
-            handler.scanVerticles(packages);
-        } else if (clazz == null && config.isVerticleScanClazzRequired()) {
-            logger.error(
-                "VerticleScan annotation not found or no package declared in VerticleScan in class "
-                    + clazz.getName());
-            throw new VertxBootException(
-                "VerticleScan annotation not found or no package declared in VerticleScan in class "
-                    + clazz.getName());
-
-        }
-    }
-
-    private static void scanByGivenPackagesIfNeeded(BootStrapConfig config)
-        throws VertxBootException {
-        String[] packages;
-        if ((packages = config.getPackages()) != null && packages.length != 0) {
-            handler.scanVerticles(packages);
-        } else if (config.isPackagesRequired()) {
-            logger.error("Packages not provided for Vertx-Boot!");
-            throw new VertxBootException("packages not provided for Vertx-Boot!");
-        }
-    }
-
-    private static void scanByGivenVerticles(BootStrapConfig config) throws VertxBootException {
-        Class[] classes;
-        if ((classes = config.getVerticles()) != null && classes.length > 0) {
-            handler.scanVerticles(classes);
-        } else if (config.isVerticlesRequired()) {
-            logger.error("Verticles not provided for Vertx-Boot!");
-            throw new VertxBootException("Verticles not provided for Vertx-Boot!");
-        }
-    }
-
-    private static void doRun(BootStrapConfig config) throws VertxBootException {
-        printLogo();
-
-        checkHandler(config.getPromise());
-
-        handler.loadProperties(config.props.getProperties());
-
-        handler.setVertx(config.getVertx());
-
-        scanVerticles(config);
-
-        handler.instantiateVerticles();
-
-        handler.initializeVerticles();
-    }
-
-    private static void printLogo() {
-        InputStream in = ClassHelper.getClassLoader().getResourceAsStream(Constants.LOGO_PATH);
-        System.out.println(new BufferedReader(new InputStreamReader(in))
-            .lines().collect(Collectors.joining(System.lineSeparator())));
+                promise.complete();
+            } catch (Exception e) {
+                logger.error("Failed to initialize Vertx-Boot Context!", e);
+                promise.fail(new VertxBootException("Failed to initialize Vertx-Boot Context!", e));
+            }
+        });
     }
 
     private static class BootStrapConfig {

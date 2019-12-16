@@ -13,5 +13,5 @@ public interface BeanHolder<T> {
 
     T getInstance();
 
-    void setInstance(T verticle);
+    void setInstance(T instance);
 }

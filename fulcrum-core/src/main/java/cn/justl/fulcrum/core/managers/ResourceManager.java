@@ -24,7 +24,7 @@ public class ResourceManager {
 
     @Start
     public void start() {
-        initMysqlClient();
+//        initMysqlClient();
 
         vertx.eventBus().consumer("test", msg -> {
             try {
@@ -57,14 +57,14 @@ public class ResourceManager {
 
     }
 
-    void initMysqlClient() {
-        JsonObject config = new JsonObject()
-                .put("url", VertxBootStrap.getContext().getProperties().getProperty("db.host"))
-                .put("driver_class", VertxBootStrap.getContext().getProperties().getProperty("db.driver"))
-                .put("user", VertxBootStrap.getContext().getProperties().getProperty("db.user"))
-                .put("password", VertxBootStrap.getContext().getProperties().getProperty("db.passwd"));
-        sqlClient = JDBCClient.createShared(vertx, config);
-    }
+//    void initMysqlClient() {
+//        JsonObject config = new JsonObject()
+//                .put("url", VertxBootStrap.getContext().getProperties().getProperty("db.host"))
+//                .put("driver_class", VertxBootStrap.getContext().getProperties().getProperty("db.driver"))
+//                .put("user", VertxBootStrap.getContext().getProperties().getProperty("db.user"))
+//                .put("password", VertxBootStrap.getContext().getProperties().getProperty("db.passwd"));
+//        sqlClient = JDBCClient.createShared(vertx, config);
+//    }
 
 
 }

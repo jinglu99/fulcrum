@@ -1,8 +1,7 @@
 package cn.justl.fulcrum.vertx.boot.annotation.handler;
 
-import cn.justl.fulcrum.vertx.boot.VerticleHolder;
 import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
-import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
+import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
@@ -16,14 +15,14 @@ import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
  */
 public interface AnnotationHandler {
 
-    BeanDefinition parseBeanDefinition(BootStrapContext context, Class clazz)
+    BeanDefinition parseBeanDefinition(Context context, Class clazz)
         throws BeanDefinitionParseException;
 
-    BeanHolder creatBean(BootStrapContext context, BeanDefinition beanDefinition) throws BeanCreationException;
+    BeanHolder creatBean(Context context, BeanDefinition beanDefinition) throws BeanCreationException;
 
-    BeanHolder initBean(BootStrapContext context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanInitializeException;
+    BeanHolder initBean(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanInitializeException;
 
-    void close(BootStrapContext context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanCloseException;
+    void close(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanCloseException;
 
     boolean isTargetBean(Class clazz);
 

@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot.definition.loader;
 
-import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
+import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
 import java.util.Set;
@@ -10,7 +10,7 @@ import java.util.Set;
  * @Author : Jingl.Wang [jingl.wang123@gmail.com]
  * @Desc :
  * A BeanDefinitionLoader define the {@link BeanDefinition} loading strategy
- * for {@link BootStrapContext}
+ * for {@link cn.justl.fulcrum.vertx.boot.context.Context}
  */
 public interface BeanClassLoader {
 

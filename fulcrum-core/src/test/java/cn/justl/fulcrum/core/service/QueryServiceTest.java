@@ -44,6 +44,20 @@ public class QueryServiceTest extends DBTest {
         System.out.println(executeSql("select * from fulcrum_resource"));
     }
 
+    @Test
+    public void initBootTest(Vertx vertx, VertxTestContext context) {
+        VertxBootStrap.run(vertx, this.getClass())
+            .compose(res->{
+                context.verify(()->{
+                    context.completeNow();
+                });
+                return Future.succeededFuture();
+            }).otherwise(throwable -> {
+                context.failNow(throwable);
+                return Future.failedFuture(throwable);
+        });
+    }
+
 
     @Test
     public void test(Vertx vertx, VertxTestContext testContext) {

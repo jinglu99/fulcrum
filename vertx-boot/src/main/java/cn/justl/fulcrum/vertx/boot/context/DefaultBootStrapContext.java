@@ -1,19 +1,23 @@
 package cn.justl.fulcrum.vertx.boot.context;
 
-import cn.justl.fulcrum.vertx.boot.annotation.handler.AnnotationHandler;
+import cn.justl.fulcrum.vertx.boot.annotation.handler.BootBeanAnnotationHandler;
+import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
-import cn.justl.fulcrum.vertx.boot.definition.BeanDefinitionRegister;
 import cn.justl.fulcrum.vertx.boot.definition.loader.BeanClassLoader;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
+import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
-import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
-import cn.justl.fulcrum.vertx.boot.excetions.VertxBootInitializeException;
-import cn.justl.fulcrum.vertx.boot.helper.AnnotationHelper;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.ServiceLoader;
+import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Date : 2019/12/13
@@ -22,59 +26,169 @@ import java.util.Set;
  */
 public class DefaultBootStrapContext extends AbstractBootStrapContext {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultBootStrapContext.class);
+
     private Vertx vertx = null;
 
-    private BeanDefinitionRegister definitionRegister = new DefaultBootStrapContext();
+    private final BootBeanAnnotationHandler bootBeanAnnotationHandler = new BootBeanAnnotationHandler();
 
-    private final ServiceLoader<AnnotationHandler> annotationHandlers = ServiceLoader
-        .load(AnnotationHandler.class);
+    private BeanClassLoader beanClassLoader = null;
 
     private Set<Class> bootBeanClasses;
 
+    private Map<String, BeanDefinition> definitionMap = new HashMap<>();
+    private Map<String, BeanHolder> beanHolderMap = new HashMap<>();
+
+
     @Override
-    public void init() throws VertxBootInitializeException {
-        try {
-
-            loadBeanDefinitions();
-
-            createBeans();
-
-            initializeBeans();
-
-        } catch (VertxBootException e) {
-            throw e;
-        }
-
-
+    public Future<Void> init() {
+        return loadBeanDefinitions()
+            .compose(aVoid -> parseBeanDefinitions())
+            .compose(aVoid -> instantiateBeans())
+            .compose(aVoid -> initializeBeans());
     }
 
-    @Override
-    public void close() throws VertxBootException {
+    /**
+     * Load bean classes by the strategies that defined in {@link DefaultBootStrapContext#beanClassLoader}.
+     */
+    public Future<Void> loadBeanDefinitions() {
+        return Future.future(promise -> {
+                try {
+                    logger.info("Start to load beanDefinitions!");
 
-    }
+                    loadBeanClasses();
 
-    @Override
-    public void closeBeans() {
-
-    }
-
-    @Override
-    public void createBeans() {
-
-    }
-
-    @Override
-    public void parseBeanDefinitions() throws BeanDefinitionParseException {
-        for (Class clazz : bootBeanClasses) {
-            Iterator iterator = annotationHandlers.iterator();
-            while (iterator.hasNext()) {
-                AnnotationHandler handler = (AnnotationHandler) iterator.next();
-                if (handler.isTargetBean(clazz)) {
-                    registerBeanDefinition(handler.parseBeanDefinition(this, clazz));
-                    break;
+                    logger.info("Finish to load beanDefinitions!");
+                    promise.complete();
+                } catch (DefinitionLoadException e) {
+                    promise.fail(e);
+                } catch (Exception e) {
+                    logger.error("Failed to load bean definitions!", e);
+                    promise
+                        .fail(new DefinitionLoadException("Failed to load bean definitions!", e));
                 }
             }
+        );
+    }
+
+
+    private void loadBeanClasses() throws DefinitionLoadException {
+        logger.info("Start to load BeanClasses...");
+
+        if (beanClassLoader == null) {
+            logger.error("No BeanClassLoader set!");
+            throw new DefinitionLoadException("No BeanClassLoader set!");
         }
+
+        bootBeanClasses = beanClassLoader.loadBeanClasses();
+
+        logger.info("Finished to load BeanClasses!");
+    }
+
+
+    private Future<Void> parseBeanDefinitions() {
+        return Future.future(promise -> {
+            try {
+                logger.info("Start to parse BeanDefinitions...");
+
+                for (Class clazz : bootBeanClasses) {
+                    if (bootBeanAnnotationHandler.isTargetBean(clazz)) {
+                        BeanDefinition definition = bootBeanAnnotationHandler
+                            .parseBeanDefinition(this, clazz);
+                        definitionMap.put(definition.getId(), definition);
+                    } else {
+                        logger.warn("Class {} is not a BootBean!", clazz.getSimpleName());
+                    }
+                }
+                logger.info("Finished to parse BeanDefinitions");
+                promise.complete();
+            } catch (BeanDefinitionParseException e) {
+                promise.fail(e);
+            } catch (Exception e) {
+                logger.error("Failed to parse BeanDefinition", e);
+                promise
+                    .fail(new BeanDefinitionParseException("Failed to parse BeanDefinition!", e));
+            }
+        });
+    }
+
+
+    @Override
+    public void setBeanClassLoader(BeanClassLoader loader) {
+        this.beanClassLoader = loader;
+    }
+
+    @Override
+    public BeanClassLoader getBeanClassLoader() {
+        return this.beanClassLoader;
+    }
+
+    @Override
+    public Set<Class> listBeanClasses() {
+        return new HashSet<>(bootBeanClasses);
+    }
+
+    private Future<Void> instantiateBeans() {
+        return Future.future(promise -> {
+            try {
+                logger.info("Start to instantiated beans...");
+                for (BeanDefinition definition : listBeanDefinitions()) {
+                    beanHolderMap.put(definition.getId(),
+                        bootBeanAnnotationHandler.creatBean(this, definition));
+                }
+                logger.info("Finished to instantiated beans!");
+                promise.complete();
+            } catch (BeanCreationException e) {
+                promise.fail(e);
+            } catch (Exception e) {
+                logger.error("Failed to instantiated beans", e);
+                promise.fail(new BeanCreationException("Failed to instantiated beans!", e));
+            }
+        });
+    }
+
+    private Future<Void> initializeBeans() {
+        return Future.future(promise -> {
+            try {
+                logger.info("Start to initialize beans...");
+                for (BeanHolder holder : listBeanHolders()) {
+                    bootBeanAnnotationHandler
+                        .initBean(this, getBeanDefinition(holder.getId()), holder);
+                }
+                logger.info("Finished to initialize beans!");
+                promise.complete();
+            } catch (BeanInitializeException e) {
+                promise.fail(e);
+            } catch (Exception e) {
+                logger.error("Failed to initialize beans", e);
+                promise.fail(new BeanInitializeException("Failed to initialize beans!", e));
+            }
+        });
+    }
+
+    @Override
+    public Future<Void> close() {
+        return null;
+    }
+
+    @Override
+    public List<BeanDefinition> listBeanDefinitions() {
+        return new ArrayList<>(definitionMap.values());
+    }
+
+    @Override
+    public List<BeanHolder> listBeanHolders() {
+        return new ArrayList<>(beanHolderMap.values());
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String id) {
+        return definitionMap.get(id);
+    }
+
+    @Override
+    public BeanHolder getBeanHolder(String id) {
+        return beanHolderMap.get(id);
     }
 
     @Override
@@ -85,56 +199,5 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
     @Override
     public void setVertx(Vertx vertx) {
         this.vertx = vertx;
-    }
-
-    public void loadBeanDefinitions() throws VertxBootInitializeException {
-        BeanClassLoader loader = getBeanClassLoader();
-
-        try {
-            this.bootBeanClasses = loader.loadBeanClasses();
-
-            parseBeanDefinitions();
-
-        } catch (DefinitionLoadException e) {
-            throw new VertxBootInitializeException("Failed to load bean definitions!", e);
-        } catch (BeanDefinitionParseException e) {
-            throw new VertxBootInitializeException("Failed to parse bean definitions!", e);
-        }
-    }
-
-    @Override
-    public void setBeanClassLoader(BeanClassLoader beanClassLoader) {
-        definitionRegister.setBeanClassLoader(beanClassLoader);
-    }
-
-    @Override
-    public BeanClassLoader getBeanClassLoader() {
-        return definitionRegister.getBeanClassLoader();
-    }
-
-    @Override
-    public void registerBeanDefinition(BeanDefinition beanDefinition) {
-        definitionRegister.registerBeanDefinition(beanDefinition);
-    }
-
-    @Override
-    public void unregisterBeanDefinition(String id) {
-        definitionRegister.unregisterBeanDefinition(id);
-    }
-
-    @Override
-    public BeanDefinition getBeanDefinition(String id) {
-        return definitionRegister.getBeanDefinition(id);
-    }
-
-    @Override
-    public List<BeanDefinition> listBeanDefinitions() {
-        return definitionRegister.listBeanDefinitions();
-    }
-
-
-    @Override
-    public void initializeBeans() {
-
     }
 }
