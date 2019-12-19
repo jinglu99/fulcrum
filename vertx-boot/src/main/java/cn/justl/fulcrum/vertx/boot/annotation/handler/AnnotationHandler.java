@@ -7,6 +7,8 @@ import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanCloseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
+import io.vertx.core.Future;
+
 
 /**
  * @Date : 2019-11-26
@@ -15,14 +17,13 @@ import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
  */
 public interface AnnotationHandler {
 
-    BeanDefinition parseBeanDefinition(Context context, Class clazz)
-        throws BeanDefinitionParseException;
+    Future<BeanDefinition> parseBeanDefinition(Context context, Class clazz);
 
-    BeanHolder createBean(Context context, BeanDefinition beanDefinition) throws BeanCreationException;
+    Future<BeanHolder> createBean(Context context, BeanDefinition beanDefinition);
 
-    BeanHolder initBean(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanInitializeException;
+    Future<BeanHolder> initBean(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder);
 
-    void close(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanCloseException;
+    Future<Void> close(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder);
 
     boolean isTargetBean(Class clazz);
 

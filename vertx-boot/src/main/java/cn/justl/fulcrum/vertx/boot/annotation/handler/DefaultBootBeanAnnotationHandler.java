@@ -11,8 +11,11 @@ import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.helper.AnnotationHelper;
+
 import java.util.Iterator;
 import java.util.ServiceLoader;
+
+import io.vertx.core.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,72 +31,121 @@ public class DefaultBootBeanAnnotationHandler implements AnnotationHandler {
     private static final ServiceLoader<BootBeanAnnotationHandler> services = ServiceLoader.load(BootBeanAnnotationHandler.class);
 
     @Override
-    public BeanDefinition parseBeanDefinition(Context context, Class clazz)
-        throws BeanDefinitionParseException {
+    public Future<BeanDefinition> parseBeanDefinition(Context context, Class clazz) {
+        return Future.future(promise -> {
 
-        Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
-        while (iterator.hasNext()) {
-            BootBeanAnnotationHandler handler = iterator.next();
-            if (handler.isTargetBean(clazz)) {
-                return handler.parseBeanDefinition(context, clazz);
+            try {
+                Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
+                while (iterator.hasNext()) {
+                    BootBeanAnnotationHandler handler = iterator.next();
+                    if (handler.isTargetBean(clazz)) {
+                        handler.parseBeanDefinition(context, clazz)
+                                .compose(definition -> {
+                                    promise.complete(definition);
+                                    return Future.succeededFuture();
+                                })
+                                .otherwise(throwable -> {
+                                    promise.fail(throwable);
+                                    return Future.failedFuture(throwable);
+                                });
+                        return;
+                    }
+                }
+                BeanDefinition definition = new DefaultBeanDefinition();
+                definition.setId(clazz.getSimpleName().substring(0, 1).toLowerCase()
+                        + clazz.getSimpleName().substring(1));
+                definition.setClazz(clazz);
+                promise.complete(definition);
+            } catch (Exception e) {
+                logger.error("Failed to parse bean definition of " + clazz.getName(), e);
+                promise.fail(new BeanCreationException("Failed to parse bean definition of " + clazz.getName(), e));
             }
-        }
+        });
 
-        BeanDefinition definition = new DefaultBeanDefinition();
-        definition.setId(clazz.getSimpleName().substring(0, 1).toLowerCase()
-            + clazz.getSimpleName().substring(1));
-        definition.setClazz(clazz);
-        return definition;
     }
 
     @Override
-    public BeanHolder createBean(Context context, BeanDefinition beanDefinition)
-        throws BeanCreationException {
-        try {
+    public Future<BeanHolder> createBean(Context context, BeanDefinition beanDefinition) {
+        return Future.future(promise -> {
+            try {
+                Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
+                while (iterator.hasNext()) {
+                    BootBeanAnnotationHandler handler = iterator.next();
+                    if (handler.isTargetBean(beanDefinition.getClazz())) {
+                        handler.createBean(context, beanDefinition)
+                                .compose(holder -> {
+                                    promise.complete(holder);
+                                    return Future.succeededFuture();
+                                })
+                                .otherwise(throwable -> {
+                                    promise.fail(throwable);
+                                    return Future.failedFuture(throwable);
+                                });
+                        return;
+                    }
+                }
 
+                Object bean = beanDefinition.getClazz().newInstance();
+                BeanHolder holder = new BeanHolderImpl();
+                holder.setId(beanDefinition.getId());
+                holder.setInstance(bean);
+                promise.complete(holder);
+            } catch (Exception e) {
+                logger.error("Failed to create bean instance of bean " + beanDefinition.getId(), e);
+                promise.fail(new BeanCreationException("Failed to create bean instance of bean " + beanDefinition.getId(), e));
+            }
+        });
+
+    }
+
+    @Override
+    public Future<BeanHolder> initBean(Context context, BeanDefinition beanDefinition,
+                               BeanHolder beanHolder) {
+
+        return Future.future(promise->{
             Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
             while (iterator.hasNext()) {
                 BootBeanAnnotationHandler handler = iterator.next();
                 if (handler.isTargetBean(beanDefinition.getClazz())) {
-                    return handler.createBean(context, beanDefinition);
+                    handler.initBean(context, beanDefinition, beanHolder)
+                            .compose(holder -> {
+                                promise.complete(holder);
+                                return Future.succeededFuture();
+                            })
+                            .otherwise(throwable -> {
+                                promise.fail(throwable);
+                                return Future.failedFuture(throwable);
+                            });
+                    return;
                 }
             }
 
-            Object bean = beanDefinition.getClazz().newInstance();
-            BeanHolder holder = new BeanHolderImpl();
-            holder.setId(beanDefinition.getId());
-            holder.setInstance(bean);
-            return holder;
-        } catch (Exception e) {
-            logger.error("Failed to create bean instance of bean " + beanDefinition.getId(), e);
-            throw new BeanCreationException("Failed to create bean instance of bean " + beanDefinition.getId(), e);
-        }
+            promise.complete(beanHolder);
+        });
     }
 
     @Override
-    public BeanHolder initBean(Context context, BeanDefinition beanDefinition,
-        BeanHolder beanHolder) throws BeanInitializeException {
-        Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
-        while (iterator.hasNext()) {
-            BootBeanAnnotationHandler handler = iterator.next();
-            if (handler.isTargetBean(beanDefinition.getClazz())) {
-                return handler.initBean(context, beanDefinition, beanHolder);
+    public Future<Void> close(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) {
+        return Future.future(promise->{
+            Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
+            while (iterator.hasNext()) {
+                BootBeanAnnotationHandler handler = iterator.next();
+                if (handler.isTargetBean(beanDefinition.getClazz())) {
+                    handler.close(context, beanDefinition, beanHolder)
+                            .compose(aVoid -> {
+                                promise.complete(aVoid);
+                                return Future.succeededFuture();
+                            })
+                            .otherwise(throwable -> {
+                                promise.fail(throwable);
+                                return Future.failedFuture(throwable);
+                            });
+                    return;
+                }
             }
-        }
-        return beanHolder;
-    }
 
-    @Override
-    public void close(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder)
-        throws BeanCloseException {
-        Iterator<BootBeanAnnotationHandler> iterator = services.iterator();
-        while (iterator.hasNext()) {
-            BootBeanAnnotationHandler handler = iterator.next();
-            if (handler.isTargetBean(beanDefinition.getClazz())) {
-                handler.close(context, beanDefinition, beanHolder);
-                return;
-            }
-        }
+            promise.complete();
+        });
     }
 
     @Override

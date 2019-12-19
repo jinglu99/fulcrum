@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HttpRouter {
+public @interface  HttpRouter {
     String value() default "/";
     HttpMethod method() default HttpMethod.GET;
     int port() default -1;

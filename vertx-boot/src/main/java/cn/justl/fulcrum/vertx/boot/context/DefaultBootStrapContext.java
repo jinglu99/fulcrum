@@ -134,7 +134,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
                 logger.info("Start to instantiated beans...");
                 for (BeanDefinition definition : listBeanDefinitions()) {
                     beanHolderMap.put(definition.getId(),
-                        bootBeanAnnotationHandler.creatBean(this, definition));
+                        bootBeanAnnotationHandler.createBean(this, definition));
                 }
                 logger.info("Finished to instantiated beans!");
                 promise.complete();
