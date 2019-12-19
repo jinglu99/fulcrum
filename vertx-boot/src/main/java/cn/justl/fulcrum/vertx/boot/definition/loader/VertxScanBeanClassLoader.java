@@ -2,6 +2,8 @@ package cn.justl.fulcrum.vertx.boot.definition.loader;
 
 import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +23,11 @@ public class VertxScanBeanClassLoader implements BeanClassLoader {
 
     private BeanClassLoader parent;
 
+    private ClassPathBeanClassLoader classPathBeanClassLoader;
+
     public VertxScanBeanClassLoader(Class clazz) throws DefinitionLoadException {
         this.clazz = clazz;
         vertxScan = (VertxScan) clazz.getAnnotation(VertxScan.class);
-
     }
 
     @Override
@@ -34,7 +37,22 @@ public class VertxScanBeanClassLoader implements BeanClassLoader {
             throw new DefinitionLoadException(
                 "Can't found VertxScan annotation in Class " + clazz.getName());
         }
-        return null;
+        String[] paths = vertxScan.value();
+        if (vertxScan.value().length == 0) {
+            paths = new String[]{clazz.getPackage().getName()};
+        }
+
+        classPathBeanClassLoader = new ClassPathBeanClassLoader(Arrays.asList(paths));
+        Set<Class> classSet = classPathBeanClassLoader.loadBeanClasses();
+
+        classSet.forEach(x -> {
+            logger.info("Load BootBean {}", x.getSimpleName());
+        });
+
+        if (parent != null) {
+            classSet.addAll(parent.loadBeanClasses());
+        }
+        return classSet;
     }
 
     @Override

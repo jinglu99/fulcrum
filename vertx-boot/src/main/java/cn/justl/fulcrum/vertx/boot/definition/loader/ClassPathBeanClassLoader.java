@@ -4,6 +4,7 @@ import cn.justl.fulcrum.vertx.boot.annotation.BootBean;
 import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
 import cn.justl.fulcrum.vertx.boot.helper.AnnotationHelper;
 import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -39,16 +40,18 @@ public class ClassPathBeanClassLoader implements BeanClassLoader {
         Set<Class> classSet = new HashSet<>();
 
         for (String path : paths) {
-
             try {
                 classSet.addAll(
                     Optional
                         .ofNullable(ClassHelper.scan(path,
-                            clazz -> AnnotationHelper.hasAnnotation(clazz, BootBean.class)))
+                            clazz -> AnnotationHelper.hasAnnotation(clazz, BootBean.class)
+                                && !Modifier.isAbstract(clazz.getModifiers())
+                                && !Modifier.isInterface(clazz.getModifiers())))
                         .orElse(Collections.emptySet())
                 );
             } catch (Exception e) {
-                throw new DefinitionLoadException("Failed to load definitions from package " + path, e);
+                throw new DefinitionLoadException("Failed to load definitions from package " + path,
+                    e);
             }
         }
 

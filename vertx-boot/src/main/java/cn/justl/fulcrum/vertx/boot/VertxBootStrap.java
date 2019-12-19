@@ -99,7 +99,7 @@ public class VertxBootStrap {
         return runWithVerticles(vertx, new InitProps(), verticles);
     }
 
-    public static Future<Void> runWithVerticles(Vertx vertx, InitProps props,
+    public static synchronized Future<Void> runWithVerticles(Vertx vertx, InitProps props,
         Class... verticles) {
         return Future.future(promise -> {
             try {
@@ -126,7 +126,7 @@ public class VertxBootStrap {
         });
     }
 
-    public static Future<Void> close() {
+    public static synchronized Future<Void> close() {
         return context.close()
             .compose(res -> {
                 context = null;

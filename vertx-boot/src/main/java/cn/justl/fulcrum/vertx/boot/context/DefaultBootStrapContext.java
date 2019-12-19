@@ -1,6 +1,6 @@
 package cn.justl.fulcrum.vertx.boot.context;
 
-import cn.justl.fulcrum.vertx.boot.annotation.handler.BootBeanAnnotationHandler;
+import cn.justl.fulcrum.vertx.boot.annotation.handler.DefaultBootBeanAnnotationHandler;
 import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.definition.loader.BeanClassLoader;
@@ -30,7 +30,7 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
 
     private Vertx vertx = null;
 
-    private final BootBeanAnnotationHandler bootBeanAnnotationHandler = new BootBeanAnnotationHandler();
+    private final DefaultBootBeanAnnotationHandler bootBeanAnnotationHandler = new DefaultBootBeanAnnotationHandler();
 
     private BeanClassLoader beanClassLoader = null;
 

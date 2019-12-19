@@ -18,7 +18,7 @@ public interface AnnotationHandler {
     BeanDefinition parseBeanDefinition(Context context, Class clazz)
         throws BeanDefinitionParseException;
 
-    BeanHolder creatBean(Context context, BeanDefinition beanDefinition) throws BeanCreationException;
+    BeanHolder createBean(Context context, BeanDefinition beanDefinition) throws BeanCreationException;
 
     BeanHolder initBean(Context context, BeanDefinition beanDefinition, BeanHolder beanHolder) throws BeanInitializeException;
 
