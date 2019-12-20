@@ -26,8 +26,13 @@ public class VertxScanBeanClassLoader implements BeanClassLoader {
     private ClassPathBeanClassLoader classPathBeanClassLoader;
 
     public VertxScanBeanClassLoader(Class clazz) throws DefinitionLoadException {
+        this(clazz, null);
+    }
+
+    public VertxScanBeanClassLoader(Class clazz, BeanClassLoader loader) throws DefinitionLoadException {
         this.clazz = clazz;
         vertxScan = (VertxScan) clazz.getAnnotation(VertxScan.class);
+        setParentLoader(loader);
     }
 
     @Override

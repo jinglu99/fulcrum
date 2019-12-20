@@ -4,6 +4,7 @@ import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
 import cn.justl.fulcrum.vertx.boot.bean.BeanHolderImpl;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
+import io.vertx.core.Verticle;
 
 /**
  * @Date : 2019-12-19
@@ -14,15 +15,26 @@ public class DefaultVerticleBeanHolder implements VerticleBeanHolder {
 
     private BeanHolder holder = new BeanHolderImpl();
 
-    private Object verticle;
+    private String verticleId;
+    private Verticle verticle;
 
     @Override
-    public void setVerticle(Object obj) {
+    public void setVerticleId(String id) {
+        this.verticleId = id;
+    }
+
+    @Override
+    public String getVerticleId() {
+        return this.verticleId;
+    }
+
+    @Override
+    public void setVerticle(Verticle obj) {
         this.verticle = obj;
     }
 
     @Override
-    public Object getVerticle() {
+    public Verticle getVerticle() {
         return this.verticle;
     }
 

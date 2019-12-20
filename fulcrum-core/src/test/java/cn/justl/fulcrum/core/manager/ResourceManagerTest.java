@@ -32,7 +32,7 @@ public class ResourceManagerTest extends DBTest {
 
     @Test
     public void test(Vertx vertx, VertxTestContext context) {
-        VertxBootStrap.runWithVerticles(vertx, ResourceManager.class)
+        VertxBootStrap.runWithBeans(vertx, ResourceManager.class)
                 .compose(res -> {
                     vertx.eventBus()
                             .request("test", "123", r -> {

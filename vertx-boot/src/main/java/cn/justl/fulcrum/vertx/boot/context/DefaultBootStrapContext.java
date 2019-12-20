@@ -71,7 +71,6 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         );
     }
 
-
     private void loadBeanClasses() throws DefinitionLoadException {
         logger.info("Start to load BeanClasses...");
 
@@ -85,25 +84,34 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         logger.info("Finished to load BeanClasses!");
     }
 
-
     private Future<Void> parseBeanDefinitions() {
         return Future.future(promise -> {
             try {
                 logger.info("Start to parse BeanDefinitions...");
-
+                Future chaim = Future.succeededFuture();
                 for (Class clazz : bootBeanClasses) {
                     if (bootBeanAnnotationHandler.isTargetBean(clazz)) {
-                        BeanDefinition definition = bootBeanAnnotationHandler
-                            .parseBeanDefinition(this, clazz);
-                        definitionMap.put(definition.getId(), definition);
+                        chaim = chaim.compose(
+                            e ->
+                                bootBeanAnnotationHandler
+                                .parseBeanDefinition(this, clazz)
+                                .compose(beanDefinition -> {
+                                    definitionMap.put(beanDefinition.getId(), beanDefinition);
+                                    return Future.succeededFuture();
+                                })
+                        );
                     } else {
                         logger.warn("Class {} is not a BootBean!", clazz.getSimpleName());
                     }
                 }
-                logger.info("Finished to parse BeanDefinitions");
-                promise.complete();
-            } catch (BeanDefinitionParseException e) {
-                promise.fail(e);
+                chaim.compose(event -> {
+                    logger.info("Finish to parse BeanDefinitions!");
+                    promise.complete();
+                    return Future.succeededFuture();
+                }).otherwise(throwable -> {
+                    promise.fail((Throwable) throwable);
+                    return Future.failedFuture((Throwable) throwable);
+                });
             } catch (Exception e) {
                 logger.error("Failed to parse BeanDefinition", e);
                 promise
@@ -112,6 +120,73 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
         });
     }
 
+    private Future<Void> instantiateBeans() {
+        return Future.future(promise -> {
+            try {
+                logger.info("Start to instantiated beans...");
+                Future chaim = Future.succeededFuture();
+                for (BeanDefinition definition : listBeanDefinitions()) {
+                    if (bootBeanAnnotationHandler.isTargetBean(definition.getClazz())) {
+                        chaim = chaim.compose(
+                            e -> bootBeanAnnotationHandler
+                                .createBean(this, definition)
+                                .compose(beanHolder -> {
+                                    beanHolderMap.put(beanHolder.getId(), beanHolder);
+                                    return Future.succeededFuture();
+                                })
+                        );
+                    } else {
+                        logger.warn("Bean {} is not a BootBean!", definition.getId());
+                    }
+                }
+                chaim.compose(event -> {
+                    logger.info("Finished to instantiated beans!");
+                    promise.complete();
+                    return Future.succeededFuture();
+                }).otherwise(throwable -> {
+                    promise.fail((Throwable) throwable);
+                    logger.error("Failed to instantiated beans", throwable);
+                    return Future.failedFuture((Throwable) throwable);
+                });
+
+            } catch (Exception e) {
+                logger.error("Failed to instantiated beans", e);
+                promise.fail(new BeanCreationException("Failed to instantiated beans!", e));
+            }
+        });
+    }
+
+    private Future<Void> initializeBeans() {
+        return Future.future(promise -> {
+            try {
+                logger.info("Start to initialize beans...");
+                Future chaim = Future.succeededFuture();
+                for (BeanHolder holder : listBeanHolders()) {
+                    BeanDefinition definition = getBeanDefinition(holder.getId());
+                    if (bootBeanAnnotationHandler.isTargetBean(definition.getClazz())) {
+                        chaim = chaim.compose(
+                            e -> bootBeanAnnotationHandler
+                                .initBean(this, definition, holder)
+                        );
+                    } else {
+                        logger.warn("Bean {} is not a BootBean!", holder.getId());
+                    }
+                }
+
+                chaim.compose(e->{
+                    logger.info("Finished to initialize beans!");
+                    promise.complete();
+                    return Future.succeededFuture();
+                }).otherwise(throwable->{
+                    promise.fail((Throwable) throwable);
+                    return Future.failedFuture((Throwable) throwable);
+                });
+            } catch (Exception e) {
+                logger.error("Failed to initialize beans", e);
+                promise.fail(new BeanInitializeException("Failed to initialize beans!", e));
+            }
+        });
+    }
 
     @Override
     public void setBeanClassLoader(BeanClassLoader loader) {
@@ -126,44 +201,6 @@ public class DefaultBootStrapContext extends AbstractBootStrapContext {
     @Override
     public Set<Class> listBeanClasses() {
         return new HashSet<>(bootBeanClasses);
-    }
-
-    private Future<Void> instantiateBeans() {
-        return Future.future(promise -> {
-            try {
-                logger.info("Start to instantiated beans...");
-                for (BeanDefinition definition : listBeanDefinitions()) {
-                    beanHolderMap.put(definition.getId(),
-                        bootBeanAnnotationHandler.createBean(this, definition));
-                }
-                logger.info("Finished to instantiated beans!");
-                promise.complete();
-            } catch (BeanCreationException e) {
-                promise.fail(e);
-            } catch (Exception e) {
-                logger.error("Failed to instantiated beans", e);
-                promise.fail(new BeanCreationException("Failed to instantiated beans!", e));
-            }
-        });
-    }
-
-    private Future<Void> initializeBeans() {
-        return Future.future(promise -> {
-            try {
-                logger.info("Start to initialize beans...");
-                for (BeanHolder holder : listBeanHolders()) {
-                    bootBeanAnnotationHandler
-                        .initBean(this, getBeanDefinition(holder.getId()), holder);
-                }
-                logger.info("Finished to initialize beans!");
-                promise.complete();
-            } catch (BeanInitializeException e) {
-                promise.fail(e);
-            } catch (Exception e) {
-                logger.error("Failed to initialize beans", e);
-                promise.fail(new BeanInitializeException("Failed to initialize beans!", e));
-            }
-        });
     }
 
     @Override

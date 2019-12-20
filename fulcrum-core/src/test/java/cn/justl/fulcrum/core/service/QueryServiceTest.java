@@ -61,7 +61,7 @@ public class QueryServiceTest extends DBTest {
 
     @Test
     public void test(Vertx vertx, VertxTestContext testContext) {
-        VertxBootStrap.runWithVerticles(vertx, new InitProps() {{
+        VertxBootStrap.runWithBeans(vertx, new InitProps() {{
             setProperties("test1.properties");
         }}, QueryService.class, QueryRequest.class, FulcrumResource.class)
             .compose(res -> {

@@ -28,7 +28,12 @@ public class ClassPathBeanClassLoader implements BeanClassLoader {
     private List<String> paths;
 
     public ClassPathBeanClassLoader(List<String> paths) {
+        this(paths, null);
+    }
+
+    public ClassPathBeanClassLoader(List<String> paths, BeanClassLoader loader) {
         this.paths = paths;
+        setParentLoader(loader);
     }
 
     @Override

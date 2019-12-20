@@ -3,12 +3,18 @@ package cn.justl.fulcrum.vertx.boot;
 import cn.justl.fulcrum.vertx.boot.annotation.VertxScan;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.context.DefaultBootStrapContext;
+import cn.justl.fulcrum.vertx.boot.definition.loader.BeanClassLoader;
+import cn.justl.fulcrum.vertx.boot.definition.loader.ClassPathBeanClassLoader;
+import cn.justl.fulcrum.vertx.boot.definition.loader.DefaultBeanClassLoader;
+import cn.justl.fulcrum.vertx.boot.definition.loader.VertxScanBeanClassLoader;
+import cn.justl.fulcrum.vertx.boot.excetions.DefinitionLoadException;
 import cn.justl.fulcrum.vertx.boot.excetions.VertxBootException;
 import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import java.util.Arrays;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +48,8 @@ public class VertxBootStrap {
                 config.setPromise(promise);
                 config.setVertx(vertx);
                 config.setProps(props);
-                config.setVerticleScanClazz(clazz);
-                config.setVerticleScanClazzRequired(true);
+                config.setVertxScanClazz(clazz);
+                config.setVertxScanClazzRequired(true);
                 doRun(config)
                     .compose(res -> {
                         promise.complete();
@@ -95,11 +101,11 @@ public class VertxBootStrap {
     /**
      * Initialize Vertx-Boot with given Verticle classes.
      */
-    public static synchronized Future<Void> runWithVerticles(Vertx vertx, Class... verticles) {
-        return runWithVerticles(vertx, new InitProps(), verticles);
+    public static synchronized Future<Void> runWithBeans(Vertx vertx, Class... verticles) {
+        return runWithBeans(vertx, new InitProps(), verticles);
     }
 
-    public static synchronized Future<Void> runWithVerticles(Vertx vertx, InitProps props,
+    public static synchronized Future<Void> runWithBeans(Vertx vertx, InitProps props,
         Class... verticles) {
         return Future.future(promise -> {
             try {
@@ -107,8 +113,8 @@ public class VertxBootStrap {
                 config.setPromise(promise);
                 config.setVertx(vertx);
                 config.setProps(props);
-                config.setVerticles(verticles);
-                config.setVerticlesRequired(true);
+                config.setBeans(verticles);
+                config.setBeansRequired(true);
 
                 doRun(config)
                     .compose(res -> {
@@ -160,7 +166,20 @@ public class VertxBootStrap {
     private static Future<Void> doRun(BootStrapConfig config) {
         return printLogo()
             .compose(VertxBootStrap::checkHandler)
+            .compose(aVoid -> prepareContext(config))
             .compose(res -> context.init());
+    }
+
+    private static Future<Void> prepareContext(BootStrapConfig config) {
+        return Future.future(promise->{
+            try {
+                context.setVertx(config.getVertx());
+                context.setBeanClassLoader(createBeanClassLoader(config));
+                promise.complete();
+            } catch (Exception e) {
+                promise.fail(e);
+            }
+        });
     }
 
     private static Future<Void> printLogo() {
@@ -180,19 +199,33 @@ public class VertxBootStrap {
         });
     }
 
+    private static BeanClassLoader createBeanClassLoader(BootStrapConfig config)
+        throws DefinitionLoadException {
+        BeanClassLoader loader = new DefaultBeanClassLoader(config.getBeans());
+
+        if (config.getVertxScanClazz() != null) {
+            loader = new VertxScanBeanClassLoader(config.getVertxScanClazz());
+        }
+
+        if (config.getPackages() != null && config.getPackages().length > 0) {
+            loader = new ClassPathBeanClassLoader(Arrays.asList(config.getPackages()), loader);
+        }
+        return loader;
+    }
+
     private static class BootStrapConfig {
 
         private Vertx vertx;
         private InitProps props;
 
-        private Class VerticleScanClazz;
-        private boolean VerticleScanClazzRequired;
+        private Class vertxScanClazz;
+        private boolean vertxScanClazzRequired;
 
         private String[] packages;
         private boolean packagesRequired;
 
-        private Class[] verticles;
-        private boolean verticlesRequired;
+        private Class[] beans;
+        private boolean beansRequired;
 
         private Promise promise;
 
@@ -213,20 +246,16 @@ public class VertxBootStrap {
             this.props = props;
         }
 
-        public Class getVerticleScanClazz() {
-            return VerticleScanClazz;
+        public Class getVertxScanClazz() {
+            return vertxScanClazz;
         }
 
-        public void setVerticleScanClazz(Class verticleScanClazz) {
-            VerticleScanClazz = verticleScanClazz;
+        public void setVertxScanClazz(Class verticleScanClazz) {
+            vertxScanClazz = verticleScanClazz;
         }
 
-        public boolean isVerticleScanClazzRequired() {
-            return VerticleScanClazzRequired;
-        }
-
-        public void setVerticleScanClazzRequired(boolean verticleScanClazzRequired) {
-            VerticleScanClazzRequired = verticleScanClazzRequired;
+        public boolean isVertxScanClazzRequired() {
+            return vertxScanClazzRequired;
         }
 
         public String[] getPackages() {
@@ -245,20 +274,24 @@ public class VertxBootStrap {
             this.packagesRequired = packagesRequired;
         }
 
-        public Class[] getVerticles() {
-            return verticles;
+        public void setVertxScanClazzRequired(boolean vertxScanClazzRequired) {
+            this.vertxScanClazzRequired = vertxScanClazzRequired;
         }
 
-        public void setVerticles(Class[] verticles) {
-            this.verticles = verticles;
+        public Class[] getBeans() {
+            return beans;
         }
 
-        public boolean isVerticlesRequired() {
-            return verticlesRequired;
+        public void setBeans(Class[] beans) {
+            this.beans = beans;
         }
 
-        public void setVerticlesRequired(boolean verticlesRequired) {
-            this.verticlesRequired = verticlesRequired;
+        public boolean isBeansRequired() {
+            return beansRequired;
+        }
+
+        public void setBeansRequired(boolean beansRequired) {
+            this.beansRequired = beansRequired;
         }
 
         public Promise getPromise() {
@@ -273,12 +306,14 @@ public class VertxBootStrap {
         public String toString() {
             return "BootStrapConfig{" +
                 "vertx=" + vertx +
-                ", VerticleScanClazz=" + VerticleScanClazz +
-                ", VerticleScanClazzRequired=" + VerticleScanClazzRequired +
+                ", props=" + props +
+                ", vertxScanClazz=" + vertxScanClazz +
+                ", vertxScanClazzRequired=" + vertxScanClazzRequired +
                 ", packages=" + Arrays.toString(packages) +
                 ", packagesRequired=" + packagesRequired +
-                ", verticles=" + Arrays.toString(verticles) +
-                ", verticlesRequired=" + verticlesRequired +
+                ", beans=" + Arrays.toString(beans) +
+                ", beansRequired=" + beansRequired +
+                ", promise=" + promise +
                 '}';
         }
     }

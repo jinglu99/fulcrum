@@ -26,7 +26,7 @@
 //public class VerticleAnnotationHandler extends AbstractAnnotationHandler implements
 //    VerticleParsable {
 //
-//    private static final Logger logger = LoggerFactory.getLogger(cn.justl.fulcrum.vertx.boot.verticle.VerticleAnnotationHandler.class);
+//    private static final Logger logger = LoggerFactory.getLogger(cn.justl.fulcrum.vertx.boot.annotation.handler.BootBeanAnnotationHandler.VerticleAnnotationHandler.class);
 //
 //
 //    @Override
