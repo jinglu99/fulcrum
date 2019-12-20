@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot.annotation;
+package cn.justl.fulcrum.vertx.boot.verticle.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PostStart {
+public @interface PreStart {
+
 }

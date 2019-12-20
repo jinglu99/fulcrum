@@ -1,4 +1,4 @@
-package cn.justl.fulcrum.vertx.boot.annotation;
+package cn.justl.fulcrum.vertx.boot.verticle.annotations;
 
 import cn.justl.fulcrum.vertx.boot.web.WebConstants;
 import io.vertx.core.http.HttpMethod;

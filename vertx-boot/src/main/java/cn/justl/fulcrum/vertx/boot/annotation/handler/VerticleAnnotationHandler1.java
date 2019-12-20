@@ -1,9 +1,9 @@
 //package cn.justl.fulcrum.vertx.boot.annotation.handler;
 //
-//import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
+//import cn.justl.fulcrum.vertx.boot.verticle.annotations.Verticle;
 //import cn.justl.fulcrum.vertx.boot.excetions.AnnotationScannerException;
 //import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
-//import cn.justl.fulcrum.vertx.boot.annotation.Start;
+//import cn.justl.fulcrum.vertx.boot.verticle.annotations.Start;
 //import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
 //import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 //import cn.justl.fulcrum.vertx.boot.excetions.BeanStartException;

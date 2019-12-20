@@ -1,8 +1,8 @@
 //package cn.justl.fulcrum.vertx.boot.annotation.handler;
 //
 //import cn.justl.fulcrum.vertx.boot.VerticleHolder;
-//import cn.justl.fulcrum.vertx.boot.annotation.HttpRouter;
-//import cn.justl.fulcrum.vertx.boot.annotation.WebVerticle;
+//import cn.justl.fulcrum.vertx.boot.verticle.annotations.HttpRouter;
+//import cn.justl.fulcrum.vertx.boot.web.WebVerticle;
 //import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 //import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
 //import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;

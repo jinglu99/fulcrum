@@ -6,10 +6,7 @@ import cn.justl.fulcrum.vertx.boot.bean.BeanHolderImpl;
 import cn.justl.fulcrum.vertx.boot.context.Context;
 import cn.justl.fulcrum.vertx.boot.definition.BeanDefinition;
 import cn.justl.fulcrum.vertx.boot.definition.DefaultBeanDefinition;
-import cn.justl.fulcrum.vertx.boot.excetions.BeanCloseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanCreationException;
-import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
-import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.helper.AnnotationHelper;
 
 import java.util.Iterator;

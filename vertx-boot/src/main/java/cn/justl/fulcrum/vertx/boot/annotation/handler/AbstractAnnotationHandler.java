@@ -2,8 +2,8 @@
 //
 //import cn.justl.fulcrum.vertx.boot.helper.ClassHelper;
 //import cn.justl.fulcrum.vertx.boot.annotation.DependOn;
-//import cn.justl.fulcrum.vertx.boot.annotation.PostStart;
-//import cn.justl.fulcrum.vertx.boot.annotation.PreStart;
+//import cn.justl.fulcrum.vertx.boot.verticle.annotations.PostStart;
+//import cn.justl.fulcrum.vertx.boot.verticle.annotations.PreStart;
 //import cn.justl.fulcrum.vertx.boot.annotation.VertX;
 //import cn.justl.fulcrum.vertx.boot.context.BootStrapContext;
 //import cn.justl.fulcrum.vertx.boot.excetions.*;

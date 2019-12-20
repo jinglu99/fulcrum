@@ -1,7 +1,7 @@
 package cn.justl.fulcrum.vertx.boot.testverticles.vertxbootstrap;
 
-import cn.justl.fulcrum.vertx.boot.annotation.Start;
-import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Start;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Verticle;
 
 /**
  * @Date : 2019/11/28

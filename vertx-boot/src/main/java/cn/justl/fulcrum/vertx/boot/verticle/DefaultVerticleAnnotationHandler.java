@@ -1,10 +1,6 @@
 package cn.justl.fulcrum.vertx.boot.verticle;
 
-import cn.justl.fulcrum.vertx.boot.annotation.PostStart;
-import cn.justl.fulcrum.vertx.boot.annotation.PreStart;
-import cn.justl.fulcrum.vertx.boot.annotation.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
-import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
 import cn.justl.fulcrum.vertx.boot.annotation.handler.BootBeanAnnotationHandler;
 import cn.justl.fulcrum.vertx.boot.annotation.handler.DefaultBootBeanAnnotationHandler;
 import cn.justl.fulcrum.vertx.boot.bean.BeanHolder;
@@ -16,6 +12,10 @@ import cn.justl.fulcrum.vertx.boot.excetions.BeanDefinitionParseException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanInitializeException;
 import cn.justl.fulcrum.vertx.boot.excetions.BeanStartException;
 import cn.justl.fulcrum.vertx.boot.helper.AnnotationHelper;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.PostStart;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.PreStart;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Start;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Verticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;

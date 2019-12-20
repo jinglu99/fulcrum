@@ -1,12 +1,9 @@
 package cn.justl.fulcrum.core.managers;
 
-import cn.justl.fulcrum.common.modal.QueryRequest;
-import cn.justl.fulcrum.vertx.boot.VertxBootStrap;
-import cn.justl.fulcrum.vertx.boot.annotation.Start;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Start;
 import cn.justl.fulcrum.vertx.boot.annotation.VertX;
-import cn.justl.fulcrum.vertx.boot.annotation.Verticle;
+import cn.justl.fulcrum.vertx.boot.verticle.annotations.Verticle;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 
 /**
